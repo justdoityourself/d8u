@@ -37,6 +37,6 @@ int v2 = root["value"]; // This converts the string to an int.
 auto nested_object = root("object"); // () returns an object type.
 
 int nested_int = root("object")["nested"]; // ether of these work
-int nested_int = nested_object["nested"]; // this one performs better
+int nested_int1 = nested_object["nested"]; // this one performs better
 
 ```
