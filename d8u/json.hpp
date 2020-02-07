@@ -13,6 +13,8 @@
 
 using namespace std;
 
+#include "../mio.hpp"
+
 namespace d8u
 {
 	namespace json
@@ -706,6 +708,8 @@ namespace d8u
 
 			template < typename F> void ForEach(F f) const
 			{
+				if (!Valid()) return;
+
 				if (isObject())
 				{
 					auto& object = Object();
@@ -740,6 +744,8 @@ namespace d8u
 
 			template < typename F> void ForEachValue(F f) const
 			{
+				if (!Valid()) return;
+
 				if (isObject())
 				{
 					auto& object = Object();
@@ -750,7 +756,7 @@ namespace d8u
 						if (!e) break;
 
 						if (!e->IsNode())
-							f(e->Key(_json.data()), e->Value(_json.data(), index));
+							f(e->Key(_json.data()), e->Value(_json.data()));
 					}
 				}
 				else
@@ -763,13 +769,15 @@ namespace d8u
 						if (!e) break;
 
 						if (!e->IsNode())
-							f(Memory(""), e->Value(_json.data(), index));
+							f(Memory(""), e->Value(_json.data()));
 					}
 				}
 			}
 
 			template < typename F> void ForEachObject(F f) const
 			{
+				if (!Valid()) return;
+
 				if (isObject())
 				{
 					auto& object = Object();
@@ -875,5 +883,34 @@ namespace d8u
 		typedef JsonIndexT<IndexStreamS, SmallJsonObjectMax> JsonReaderS;
 		typedef JsonIndexT<IndexStreamM, MediumJsonObjectMax> JsonReader;
 		typedef JsonIndexT<IndexStream, JsonObjectMax> JsonReaderL;
+
+		template <typename T> class JsonMapT : public T
+		{
+		public:
+			JsonMapT() {}
+			JsonMapT(string_view file)
+				: mapped_data(file)
+			{
+				T::Index(mapped_data);
+			}
+
+			void Map(string_view file)
+			{
+				std::error_code error;
+				mapped_data.map(file, error);
+
+				if (error) 
+					throw std::system_error(error);
+
+				T::Index(mapped_data);
+			}
+
+		private:
+			mio::mmap_source mapped_data;
+		};
+
+		typedef JsonMapT<JsonReaderS> JsonMapS;
+		typedef JsonMapT<JsonReader> JsonMap;
+		typedef JsonMapT<JsonReaderL> JsonMapL;
 	}
 }

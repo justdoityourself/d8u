@@ -291,6 +291,9 @@
     <ClInclude Include="d8u\util.hpp" />
     <ClInclude Include="gsl-lite.hpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include=".gitignore" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
