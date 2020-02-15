@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <array>
 #include <string_view>
+#include <charconv>
 
 #include "memory.hpp"
 #include "util.hpp"
@@ -496,7 +497,26 @@ namespace d8u
 		};
 
 
+		vector<uint8_t> htob(std::string_view v)
+		{
+			std::vector<uint8_t> result; result.reserve(v.size() / 2 + 1);
+			auto ctoi = [](char c)
+			{
+				if (c >= '0' && c <= '9')
+					return c - '0';
+				if (c >= 'A' && c <= 'F')
+					return c - 'A' + 10;
+				if (c >= 'a' && c <= 'f')
+					return c - 'a' + 10;
 
+				return 0;
+			};
+
+			for (auto c = v.begin(); c < v.end(); c += 2)
+				result.push_back((ctoi(*c) << 4) + ctoi(*(c + 1)));
+
+			return result;
+		}
 
 		template < typename T >class JsonIndexBase
 		{
@@ -523,7 +543,53 @@ namespace d8u
 				~Getter(){}
 
 				operator string_view() { return string_view((const char*)data(), size()); }
+				operator int()
+				{ 
+					int result=0;
+
+					auto v = string_view((const char*)data(), size());
+					std::from_chars(v.data(), v.data() + v.size(), result);
+
+					return result;
+				}
+
+				operator bool()
+				{
+					int result = 0;
+
+					if (!size())
+						return false;
+
+					auto v = string_view((const char*)data(), size());
+
+					if (v[0] == 'T' || v[0] == 't')
+						return true;
+
+					if (v[0] == 'F' || v[0] == 'f')
+						return false;
+
+					std::from_chars(v.data(), v.data() + v.size(), result);
+
+					return result != 0;
+				}
+
+				operator size_t()
+				{
+					size_t result = 0;
+
+					auto v = string_view((const char*)data(), size());
+					std::from_chars(v.data(), v.data() + v.size(), result);
+
+					return result;
+				}
+
 				operator string() { return string((const char*)data(), size()); }
+
+				operator vector<uint8_t>()
+				{
+					auto v = string_view((const char*)data(), size());
+					return htob(v);
+				}
 
 				void* root;
 				bool ro;
