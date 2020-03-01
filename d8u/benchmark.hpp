@@ -253,12 +253,14 @@ namespace d8u
         auto json_small8 = json<JsonReaderS,Small>;
         auto json_small16 = json<JsonReader, Small>;
         auto json_small32 = json<JsonReaderL, Small>;
+        auto json_small64 = json<JsonReaderH, Small>;
         auto json_nlohmann = nlohmann_json<Small>;
         auto json_pico = pico_json<Small>;
 
         PICOBENCH(json_small8);
         PICOBENCH(json_small16);
         PICOBENCH(json_small32);
+        PICOBENCH(json_small64);
         PICOBENCH(json_nlohmann);
         PICOBENCH(json_pico);
 
@@ -268,11 +270,13 @@ namespace d8u
 
         auto json_medium16 = json<JsonReader, Medium>;
         auto json_medium32 = json<JsonReaderL, Medium>;
+        auto json_medium64 = json<JsonReaderH, Medium>;
         auto json_mnlohmann = nlohmann_json<Medium>;
         auto json_mpico = pico_json<Medium>;
 
         PICOBENCH(json_medium16);
         PICOBENCH(json_medium32);
+        PICOBENCH(json_medium64);
         PICOBENCH(json_mnlohmann);
         PICOBENCH(json_mpico);
 
@@ -282,11 +286,13 @@ namespace d8u
 
         auto json_large16 = json<JsonReader, Large>;
         auto json_large32 = json<JsonReaderL, Large>;
+        auto json_large64 = json<JsonReaderH, Large>;
         auto json_lnlohmann = nlohmann_json<Large>;
         auto json_lpico = pico_json<Large>;
 
         PICOBENCH(json_large16);
         PICOBENCH(json_large32);
+        PICOBENCH(json_large64);
         PICOBENCH(json_lnlohmann);
         PICOBENCH(json_lpico);
 

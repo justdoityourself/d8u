@@ -47,6 +47,12 @@
     <ClInclude Include="d8u\benchmark.hpp">
       <Filter>d8u</Filter>
     </ClInclude>
+    <ClInclude Include="d8u\buffer.hpp">
+      <Filter>d8u</Filter>
+    </ClInclude>
+    <ClInclude Include="d8u\string_switch.hpp">
+      <Filter>d8u</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />

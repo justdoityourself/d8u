@@ -2,8 +2,12 @@
 
 #pragma once
 
+#include <atomic>
 #include <cstdint>
 
+#include "../gsl-lite.hpp"
+
+using namespace gsl;
 using namespace std;
 
 namespace d8u
@@ -12,6 +16,13 @@ namespace d8u
 
 	namespace util
 	{
+		template <typename T> T& singleton()
+		{
+			static T t;
+
+			return t;
+		}
+
 		template <typename T> using upair = std::pair<T, T>;
 		template <typename T> using utri = std::tuple<T, T, T>;
 

@@ -284,8 +284,10 @@
   <ItemGroup>
     <ClInclude Include="catch.hpp" />
     <ClInclude Include="d8u\benchmark.hpp" />
+    <ClInclude Include="d8u\buffer.hpp" />
     <ClInclude Include="d8u\json.hpp" />
     <ClInclude Include="d8u\memory.hpp" />
+    <ClInclude Include="d8u\string_switch.hpp" />
     <ClInclude Include="d8u\test.hpp" />
     <ClInclude Include="d8u\tsm.hpp" />
     <ClInclude Include="d8u\util.hpp" />

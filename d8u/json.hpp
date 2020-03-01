@@ -945,10 +945,12 @@ namespace d8u
 		typedef JsonIndexStream<uint8_t, 32, 0xfe> IndexStreamS;
 		typedef JsonIndexStream<uint16_t, 256, 0xfffe> IndexStreamM;
 		typedef JsonIndexStream<uint32_t, 4096, 0xfffffffe> IndexStream;
+		typedef JsonIndexStream<uint64_t, 4096, 0xfffffffe> IndexStreamH;
 
 		typedef JsonIndexT<IndexStreamS, SmallJsonObjectMax> JsonReaderS;
 		typedef JsonIndexT<IndexStreamM, MediumJsonObjectMax> JsonReader;
 		typedef JsonIndexT<IndexStream, JsonObjectMax> JsonReaderL;
+		typedef JsonIndexT<IndexStreamH, JsonObjectMax> JsonReaderH;
 
 		template <typename T> class JsonMapT : public T
 		{
