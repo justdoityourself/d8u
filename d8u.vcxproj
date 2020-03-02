@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Benchmark|Win32">
@@ -280,6 +280,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="d8u.cpp" />
+    <ClCompile Include="d8u\compare.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="catch.hpp" />
@@ -289,6 +290,7 @@
     <ClInclude Include="d8u\memory.hpp" />
     <ClInclude Include="d8u\string_switch.hpp" />
     <ClInclude Include="d8u\test.hpp" />
+    <ClInclude Include="d8u\transform.hpp" />
     <ClInclude Include="d8u\tsm.hpp" />
     <ClInclude Include="d8u\util.hpp" />
     <ClInclude Include="gsl-lite.hpp" />

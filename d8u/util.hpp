@@ -4,6 +4,8 @@
 
 #include <atomic>
 #include <cstdint>
+#include <filesystem>
+#include <fstream>
 
 #include "../gsl-lite.hpp"
 
@@ -16,6 +18,51 @@ namespace d8u
 
 	namespace util
 	{
+		void empty_file(const string_view file)
+		{
+			ofstream fs(file, ios::out);
+		}
+
+		template <typename T> uint64_t append_file(const string_view file, const T& m)
+		{
+			ofstream fs(file, ios::out | fstream::app | ios::binary);
+			uint64_t result = fs.tellp();
+			fs.write((const char*)&m.length, sizeof(uint32_t));
+			fs.write((const char*)m.data(), m.size());
+
+			return result;
+		}
+
+		void empty_file1(const string_view file)
+		{
+			ofstream fout;
+			fout.open(file, ios::out);
+			fout << 'c';
+		}
+
+#if defined ( _WIN32 )
+#include <sys/stat.h>
+#endif
+
+		std::time_t GetFileWriteTime(const std::filesystem::path& filename)
+		{
+#if defined ( _WIN32 )
+			{
+				struct _stat64 fileInfo;
+				if (_wstati64(filename.wstring().c_str(), &fileInfo) != 0)
+				{
+					throw std::runtime_error("Failed to get last write time.");
+				}
+				return fileInfo.st_mtime;
+			}
+#else
+			{
+				auto fsTime = std::filesystem::last_write_time(filename);
+				return decltype (fsTime)::clock::to_time_t(fsTime);
+			}
+#endif
+		}
+
 		template <typename T> T& singleton()
 		{
 			static T t;
