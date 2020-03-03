@@ -38,18 +38,41 @@ namespace d8u
 			return std::equal(file1.begin(), file1.end(), file2.begin());
 		}
 
-		bool folders(std::string_view o, std::string_view t)
+		bool folders(std::string_view o, std::string_view t,size_t F = 1)
 		{
+			std::atomic<size_t> threads = 0;
+
+			bool result = true;
 			for (auto& e : std::filesystem::recursive_directory_iterator(o))
 			{
+				if (!result)
+					break;
+
 				if (e.is_directory())
 					continue;
 
+				if(F==1)
 				if (!files(e.path().string(), string(t) + "\\" + e.path().string()))
 					return false;
+				else
+				{
+					fast_wait(threads, F);
+
+					threads++;
+
+					std::thread([&](std::string s) 
+					{
+						if(!files(s, string(t) + "\\" + s))
+							result = false;
+
+						threads--;
+					}, e.path().string()).detach();
+
+					slow_wait(threads);
+				}
 			}
 
-			return true;
+			return result;
 		}
 
 		template<typename D1, typename D2> bool devices(const D1& d1, upair<uint64_t> s1, const D2& d2, upair<uint64_t> s2)

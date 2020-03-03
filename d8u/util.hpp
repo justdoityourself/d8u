@@ -6,6 +6,8 @@
 #include <cstdint>
 #include <filesystem>
 #include <fstream>
+#include <atomic>
+#include <thread>
 
 #include "../gsl-lite.hpp"
 
@@ -18,6 +20,28 @@ namespace d8u
 
 	namespace util
 	{
+		template<typename T> class dec_scope
+		{
+			T& t;
+
+		public:
+			dec_scope(T& _t) :t(_t) {}
+
+			~dec_scope() { t--; }
+		};
+
+		void fast_wait(std::atomic<size_t> & A, size_t M=1)
+		{
+			while (A.load() >= M)
+				std::this_thread::sleep_for(std::chrono::milliseconds(10));
+		}
+
+		void slow_wait(std::atomic<size_t>& A, size_t M=1)
+		{
+			while (A.load() >= M)
+				std::this_thread::sleep_for(std::chrono::milliseconds(100));
+		}
+
 		void empty_file(const string_view file)
 		{
 			ofstream fs(file, ios::out);
@@ -82,8 +106,8 @@ namespace d8u
 			uint64_t duplicate;
 			uint64_t blocks;
 			uint64_t dblocks;
-			uint32_t threads;
-			uint32_t files;
+			size_t threads;
+			size_t files;
 		};
 
 		struct Atomic
@@ -95,8 +119,8 @@ namespace d8u
 			std::atomic<uint64_t> duplicate;
 			std::atomic<uint64_t> blocks;
 			std::atomic<uint64_t> dblocks;
-			std::atomic<uint32_t> threads;
-			std::atomic<uint32_t> files;
+			std::atomic<size_t> threads;
+			std::atomic<size_t> files;
 		};
 
 		struct Statistics
