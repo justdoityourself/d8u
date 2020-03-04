@@ -11,15 +11,15 @@
 
 #include "../gsl-lite.hpp"
 
-using namespace gsl;
-using namespace std;
-
 namespace d8u
 {
 #define self_t (*this)
 
 	namespace util
 	{
+		using namespace gsl;
+		using namespace std;
+
 		template<typename T> class dec_scope
 		{
 			T& t;

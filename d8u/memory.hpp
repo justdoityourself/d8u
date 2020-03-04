@@ -5,10 +5,10 @@
 #include <cstdint>
 #include <stdexcept>
 
-using namespace std;
-
 namespace d8u
 {
+	using namespace std;
+
 	template < typename T, std::size_t N > constexpr size_t __array_elements(const T(&)[N]) { return (size_t)N; }
 	template < typename T, std::size_t N > constexpr size_t __array_element_size(const T(&)[N]) { return (size_t)sizeof(T); }
 	template < typename T > constexpr size_t __array_bytes(T& t) { return __array_elements(t) * __array_element_size(t); }

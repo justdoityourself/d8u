@@ -15,15 +15,15 @@
 
 #include "../gsl-lite.hpp"
 
-using gsl::span;
-
-using std::array;
-using std::vector;
-
 namespace d8u
 {
 	namespace transform
 	{
+		using gsl::span;
+
+		using std::array;
+		using std::vector;
+
 		template <typename T, typename Y> void default_hash(const T& input_buffer, Y& output_buffer)
 		{
 			CryptoPP::SHA256().CalculateDigest(output_buffer.data(), (const CryptoPP::byte*) input_buffer.data(), input_buffer.size());

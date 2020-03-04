@@ -12,14 +12,14 @@
 #include "util.hpp"
 #include "tsm.hpp"
 
-using namespace std;
-
 #include "../mio.hpp"
 
 namespace d8u
 {
 	namespace json
 	{
+		using namespace std;
+
 		class JsonStream
 		{
 		public:
