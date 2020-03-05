@@ -2,6 +2,21 @@
 
 #pragma once
 
+#include <locale>
+#include <codecvt>
+
+#include <string>
+#include <string_view>
+#include <array>
+
+#include <random>
+#include <time.h>
+#include <chrono>
+
+//Picosha is slow slow slow, but you can uncomment it if you don't have cryptopp set up.
+//#include "../picosha2.hpp"
+#include "cryptopp/sha.h"
+
 #include <atomic>
 #include <cstdint>
 #include <filesystem>
@@ -9,16 +24,57 @@
 #include <atomic>
 #include <thread>
 
+#include "../mio.hpp"
 #include "../gsl-lite.hpp"
+
+#ifdef _WIN32
+#include "Objbase.h"
+#endif
 
 namespace d8u
 {
-#define self_t (*this)
+	#define self_t (*this)
 
 	namespace util
 	{
 		using namespace gsl;
 		using namespace std;
+
+
+		constexpr char hexmap[] = { '0', '1', '2', '3', '4', '5', '6', '7',
+									'8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
+
+		template <typename T> string to_hex(const T& d)
+		{
+			string s(d.size() * 2, ' ');
+			for (size_t i = 0; i < d.size(); ++i)
+			{
+				s[2 * i] = hexmap[(d[i] & 0xF0) >> 4];
+				s[2 * i + 1] = hexmap[d[i] & 0x0F];
+			}
+			return s;
+		}
+
+		vector<uint8_t> to_bin(std::string_view v)
+		{
+			std::vector<uint8_t> result; result.reserve(v.size() / 2 + 1);
+			auto ctoi = [](char c)
+			{
+				if (c >= '0' && c <= '9')
+					return c - '0';
+				if (c >= 'A' && c <= 'F')
+					return c - 'A' + 10;
+				if (c >= 'a' && c <= 'f')
+					return c - 'a' + 10;
+
+				return 0;
+			};
+
+			for (auto c = v.begin(); c < v.end(); c += 2)
+				result.push_back((ctoi(*c) << 4) + ctoi(*(c + 1)));
+
+			return result;
+		}
 
 		template<typename T> class dec_scope
 		{
@@ -224,6 +280,149 @@ namespace d8u
 			offset += sizeof(T);
 
 			return *res;
+		}
+
+		string now()
+		{
+			chrono::system_clock::time_point p = chrono::system_clock::now();
+			time_t t = chrono::system_clock::to_time_t(p);
+
+			return to_string((uint64_t)t);
+		}
+
+		typedef array<uint8_t, 32> file_id;
+		void id_file(string_view name, file_id& hash)
+		{
+			mio::mmap_source file(name);
+			CryptoPP::SHA256().CalculateDigest(hash.data(), (const CryptoPP::byte*) file.data(), file.size());
+			//picosha2::hash256(file.begin(), file.end(), hash.begin(), hash.end());
+		}
+
+		size_t Random(size_t max = -1)
+		{
+			static default_random_engine e(std::random_device{}());
+
+			size_t result = e();
+			result <<= 32; //e() doesn't fill top dword of qword
+			result += e();
+
+			return result % max;
+		}
+
+		bool Flip() { return (Random() % 2) == 0; }
+
+		template < typename T > vector<T> RandomVector(size_t size)
+		{
+			vector<T> result;
+			result.resize(size);
+
+			static default_random_engine e(std::random_device{}());
+
+			for (size_t i = 0; i < size; i++)
+				result[i] = (T)Random();
+
+			return result;
+		}
+
+		//Original from d88::factor
+		/*template < typename T > void FactorExpand(const span<T>& poly, span<T> output)
+		{
+			auto const u = poly.size();
+			vector<T> l(u + output.size());
+
+			for (size_t i = 0; i < u - 2; i++)
+				l[i] = 0;
+
+			l[u - 2] = 1;
+
+			for (size_t i = 0; i < output.size(); i++)
+			{
+				size_t sum = 0;
+
+				for (size_t j = 0, k = u - 1; j < u - 1; j++, k--)
+					sum += poly[k] * l[i + j];
+
+				l[u + i - 1] = sum;
+				output[i] = sum;
+			}
+		}*/
+
+		//Performance consideration, limit length to 16 iterations
+		template < typename T > void FactorExpand(const span<T>& poly, span<T> output)
+		{
+			auto const u = poly.size();
+			vector<T> l(u + output.size());
+
+			for (size_t i = 0; i < u - 2; i++)
+				l[i] = 0;
+
+			l[u - 2] = 1;
+
+			for (size_t i = 0; i < output.size(); i++)
+			{
+				if (i >= 16)
+				{
+					output[i] = 0;
+					continue;
+				}
+
+				size_t sum = 0;
+
+				for (size_t j = 0, k = u - 1; j < u - 1; j++, k--)
+					sum += poly[k] * l[i + j];
+
+				l[u + i - 1] = sum;
+				output[i] = sum;
+			}
+		}
+
+		constexpr size_t _mb(size_t s) { return s * 1024 * 1024; }
+		constexpr size_t _kb(size_t s) { return s * 1024; }
+		constexpr size_t _gb(size_t s) { return s * 1024 * 1024 * 1024; }
+
+		wstring to_wide(string_view s)
+		{
+			//This Method, is so slow and uses thread locks
+			//std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+			//return converter.from_bytes(string(s));
+
+			//Back to the basics, no good deed unpunished.
+			return std::wstring(s.begin(), s.end());
+		}
+
+		string to_narrow(wstring_view s)
+		{
+			//This Method, is so slow and uses thread locks
+			//std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+			//return converter.to_bytes(wstring(s));
+
+			//Back to the basics, no good deed unpunished.
+			return std::string(s.begin(), s.end());
+		}
+
+		void string_as_file(string_view file, string_view data)
+		{
+			filesystem::remove(file);
+
+			ofstream f(file);
+			f << data;
+		}
+
+		array<uint8_t, 16> unique_id()
+		{
+#ifdef _WIN32
+			array<uint8_t, 16> ret;
+			HRESULT hresult = CoCreateGuid((GUID*)ret.data());
+
+			if (S_OK != hresult)
+				throw std::runtime_error("Failed to create GUID");
+
+			return ret;
+#else
+			throw "TODO";
+
+			return array<uint8_t, 16>();
+#endif
 		}
 
 

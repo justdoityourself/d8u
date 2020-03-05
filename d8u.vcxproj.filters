@@ -16,10 +16,148 @@
     <Filter Include="d8u">
       <UniqueIdentifier>{58ea17f4-1b98-458d-8fe7-cbefa47d8131}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\lzma">
+      <UniqueIdentifier>{a1c5d6f0-5ce4-4246-ab3d-d514d0d59e94}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="d8u.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="d8u\compare.hpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\7zAlloc.c">
+      <Filter>Source Files\lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\7zArcIn.c">
+      <Filter>Source Files\lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\7zBuf.c">
+      <Filter>Source Files\lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\7zBuf2.c">
+      <Filter>Source Files\lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\7zCrc.c">
+      <Filter>Source Files\lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\7zCrcOpt.c">
+      <Filter>Source Files\lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\7zDec.c">
+      <Filter>Source Files\lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\7zFile.c">
+      <Filter>Source Files\lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\7zStream.c">
+      <Filter>Source Files\lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\Aes.c">
+      <Filter>Source Files\lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\AesOpt.c">
+      <Filter>Source Files\lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\Alloc.c">
+      <Filter>Source Files\lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\Bcj2.c">
+      <Filter>Source Files\lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\Bcj2Enc.c">
+      <Filter>Source Files\lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\Bra.c">
+      <Filter>Source Files\lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\Bra86.c">
+      <Filter>Source Files\lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\BraIA64.c">
+      <Filter>Source Files\lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\CpuArch.c">
+      <Filter>Source Files\lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\Delta.c">
+      <Filter>Source Files\lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\DllSecur.c">
+      <Filter>Source Files\lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\LzFind.c">
+      <Filter>Source Files\lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\LzFindMt.c">
+      <Filter>Source Files\lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\Lzma2Dec.c">
+      <Filter>Source Files\lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\Lzma2DecMt.c">
+      <Filter>Source Files\lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\Lzma2Enc.c">
+      <Filter>Source Files\lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\Lzma86Dec.c">
+      <Filter>Source Files\lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\Lzma86Enc.c">
+      <Filter>Source Files\lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\LzmaDec.c">
+      <Filter>Source Files\lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\LzmaEnc.c">
+      <Filter>Source Files\lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\LzmaLib.c">
+      <Filter>Source Files\lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\MtCoder.c">
+      <Filter>Source Files\lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\MtDec.c">
+      <Filter>Source Files\lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\Ppmd7.c">
+      <Filter>Source Files\lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\Ppmd7Dec.c">
+      <Filter>Source Files\lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\Ppmd7Enc.c">
+      <Filter>Source Files\lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\Sha256.c">
+      <Filter>Source Files\lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\Sort.c">
+      <Filter>Source Files\lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\Threads.c">
+      <Filter>Source Files\lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\Xz.c">
+      <Filter>Source Files\lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\XzCrc64.c">
+      <Filter>Source Files\lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\XzCrc64Opt.c">
+      <Filter>Source Files\lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\XzDec.c">
+      <Filter>Source Files\lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\XzEnc.c">
+      <Filter>Source Files\lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\XzIn.c">
+      <Filter>Source Files\lzma</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
