@@ -186,6 +186,18 @@ namespace d8u
 				Initialize();
 			}
 
+			void Print()
+			{
+				std::cout << "Threads " << direct.threads << ", ";
+				std::cout << "Files " << direct.files << ", ";
+				std::cout << "Read " << direct.read << ", ";
+				std::cout << "Write " << direct.write << ", ";
+				std::cout << "Duplicate " << direct.duplicate << " ";
+				
+				std::cout << "\r";
+				std::cout.flush();
+			}
+
 			static_assert(sizeof(uint64_t) == sizeof(std::atomic<uint64_t>));
 
 			union
