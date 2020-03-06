@@ -188,6 +188,9 @@ namespace d8u
 
 			void Print()
 			{
+				if (!direct.threads && !direct.files && !direct.read && !direct.write && !direct.duplicate)
+					return;
+
 				std::cout << "Threads " << direct.threads << ", ";
 				std::cout << "Files " << direct.files << ", ";
 				std::cout << "Read " << direct.read << ", ";
