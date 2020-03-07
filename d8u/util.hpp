@@ -196,9 +196,6 @@ namespace d8u
 				std::cout << "Read " << direct.read << ", ";
 				std::cout << "Write " << direct.write << ", ";
 				std::cout << "Duplicate " << direct.duplicate << " ";
-				
-				std::cout << "\r";
-				std::cout.flush();
 			}
 
 			static_assert(sizeof(uint64_t) == sizeof(std::atomic<uint64_t>));
