@@ -219,6 +219,7 @@ namespace d8u
 				direct.blocks = 0;
 				direct.dblocks = 0;
 				direct.threads = 0;
+				direct.queries = 0;
 				direct.files = 0;
 				direct.items = 0;
 			}
@@ -232,6 +233,8 @@ namespace d8u
 				direct.dblocks += r.direct.dblocks;
 				direct.threads += r.direct.threads;
 				direct.files += r.direct.files;
+				direct.items += r.direct.items;
+				direct.queries += r.direct.queries;
 			}
 		};
 
