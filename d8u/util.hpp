@@ -162,8 +162,10 @@ namespace d8u
 			uint64_t duplicate;
 			uint64_t blocks;
 			uint64_t dblocks;
+			uint64_t queries;
 			size_t threads;
 			size_t files;
+			size_t items;
 		};
 
 		struct Atomic
@@ -175,8 +177,10 @@ namespace d8u
 			std::atomic<uint64_t> duplicate;
 			std::atomic<uint64_t> blocks;
 			std::atomic<uint64_t> dblocks;
+			std::atomic<uint64_t> queries;
 			std::atomic<size_t> threads;
 			std::atomic<size_t> files;
+			std::atomic<size_t> items;
 		};
 
 		struct Statistics
@@ -188,14 +192,14 @@ namespace d8u
 
 			void Print()
 			{
-				if (!direct.threads && !direct.files && !direct.read && !direct.write && !direct.duplicate)
-					return;
-
-				std::cout << "Threads " << direct.threads << ", ";
-				std::cout << "Files " << direct.files << ", ";
-				std::cout << "Read " << direct.read << ", ";
-				std::cout << "Write " << direct.write << ", ";
-				std::cout << "Duplicate " << direct.duplicate << " ";
+				if(direct.threads) std::cout << "Threads " << direct.threads << ", ";
+				if(direct.files) std::cout << "Handles " << direct.files << ", ";
+				if (direct.items) std::cout << "Files " << direct.items << ", ";
+				if (direct.blocks) std::cout << "Blocks " << direct.blocks << ", ";
+				if (direct.queries) std::cout << "Queries " << direct.queries << ", ";
+				if (direct.threads) std::cout << "Read " << direct.read << ", ";
+				if (direct.write) std::cout << "Write " << direct.write << ", ";
+				if (direct.duplicate) std::cout << "Duplicate " << direct.duplicate << " ";
 			}
 
 			static_assert(sizeof(uint64_t) == sizeof(std::atomic<uint64_t>));
@@ -216,6 +220,7 @@ namespace d8u
 				direct.dblocks = 0;
 				direct.threads = 0;
 				direct.files = 0;
+				direct.items = 0;
 			}
 
 			void operator += (const Statistics& r)
