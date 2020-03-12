@@ -210,7 +210,7 @@ namespace d8u
 					std::cout << "Blocks " << direct.blocks << ", ";
 				if (direct.queries) 
 					std::cout << "Queries " << direct.queries << ", ";
-				if (direct.threads) 
+				if (direct.read)
 					std::cout << "Read " << direct.read << ", ";
 				if (direct.write) 
 					std::cout << "Write " << direct.write << ", ";
