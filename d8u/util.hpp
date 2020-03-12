@@ -192,14 +192,30 @@ namespace d8u
 
 			void Print()
 			{
-				if(direct.threads) std::cout << "Threads " << direct.threads << ", ";
-				if(direct.files) std::cout << "Handles " << direct.files << ", ";
-				if (direct.items) std::cout << "Files " << direct.items << ", ";
-				if (direct.blocks) std::cout << "Blocks " << direct.blocks << ", ";
-				if (direct.queries) std::cout << "Queries " << direct.queries << ", ";
-				if (direct.threads) std::cout << "Read " << direct.read << ", ";
-				if (direct.write) std::cout << "Write " << direct.write << ", ";
-				if (direct.duplicate) std::cout << "Duplicate " << direct.duplicate << " ";
+				if (direct.target)
+				{
+					auto p = (double)direct.read / (double)direct.target * 100;
+					if (p > 100)
+						p = 100;
+
+					std::cout << "" << p << "% , ";
+				}
+				if(direct.threads) 
+					std::cout << "Threads " << direct.threads << ", ";
+				if(direct.files) 
+					std::cout << "Handles " << direct.files << ", ";
+				if (direct.items) 
+					std::cout << "Files " << direct.items << ", ";
+				if (direct.blocks) 
+					std::cout << "Blocks " << direct.blocks << ", ";
+				if (direct.queries) 
+					std::cout << "Queries " << direct.queries << ", ";
+				if (direct.threads) 
+					std::cout << "Read " << direct.read << ", ";
+				if (direct.write) 
+					std::cout << "Write " << direct.write << ", ";
+				if (direct.duplicate) 
+					std::cout << "Duplicate " << direct.duplicate << " ";
 			}
 
 			static_assert(sizeof(uint64_t) == sizeof(std::atomic<uint64_t>));
