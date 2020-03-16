@@ -1,0 +1,43 @@
+/* Copyright (C) 2020 D8DATAWORKS - All Rights Reserved */
+
+#pragma once
+
+#include <vector>
+#include <random>
+
+namespace d8u
+{
+	namespace random
+	{
+		using namespace std;
+
+		size_t Integer(size_t max = -1)
+		{
+			static default_random_engine e(random_device{}());
+
+			size_t result = e();
+			result <<= 32; //e() doesn't fill top dword of qword
+			result += e();
+
+			return result % max;
+		}
+
+		bool Flip() { return (Integer() % 2) == 0; }
+
+		template < typename T > vector<T> Vector(size_t size)
+		{
+			vector<T> result;
+			result.resize(size);
+
+			for (size_t i = 0; i < size; i++)
+			{
+				if constexpr (std::is_class<T>())
+					result[i].Random();
+				else
+					result[i] = (T)Integer();
+			}
+
+			return result;
+		}
+	}
+}

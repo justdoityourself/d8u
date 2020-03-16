@@ -9,8 +9,6 @@
 #include <string_view>
 #include <array>
 
-#include <random>
-#include <time.h>
 #include <chrono>
 
 //Picosha is slow slow slow, but you can uncomment it if you don't have cryptopp set up.
@@ -332,32 +330,6 @@ namespace d8u
 			mio::mmap_source file(name);
 			CryptoPP::SHA256().CalculateDigest(hash.data(), (const CryptoPP::byte*) file.data(), file.size());
 			//picosha2::hash256(file.begin(), file.end(), hash.begin(), hash.end());
-		}
-
-		size_t Random(size_t max = -1)
-		{
-			static default_random_engine e(std::random_device{}());
-
-			size_t result = e();
-			result <<= 32; //e() doesn't fill top dword of qword
-			result += e();
-
-			return result % max;
-		}
-
-		bool Flip() { return (Random() % 2) == 0; }
-
-		template < typename T > vector<T> RandomVector(size_t size)
-		{
-			vector<T> result;
-			result.resize(size);
-
-			static default_random_engine e(std::random_device{}());
-
-			for (size_t i = 0; i < size; i++)
-				result[i] = (T)Random();
-
-			return result;
 		}
 
 		//Original from d88::factor
