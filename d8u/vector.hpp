@@ -7,7 +7,7 @@
 
 namespace d8u
 {
-	namespace vector
+	namespace util
 	{
 		using namespace std;
 

@@ -336,6 +336,7 @@
     <ClInclude Include="d8u\buffer.hpp" />
     <ClInclude Include="d8u\json.hpp" />
     <ClInclude Include="d8u\memory.hpp" />
+    <ClInclude Include="d8u\string.hpp" />
     <ClInclude Include="d8u\string_switch.hpp" />
     <ClInclude Include="d8u\test.hpp" />
     <ClInclude Include="d8u\transform.hpp" />
