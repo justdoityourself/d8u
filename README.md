@@ -51,7 +51,7 @@ Compared to picojson and nlohmannjson.
 
 ### Small JSON
 
-   Name (baseline is *)   |   Dim   |  Total ms |  ns/op  |Baseline| Ops/second
+#### Name (baseline is *)   |   Dim   |  Total ms |  ns/op  |Baseline| Ops/second
 ===============================================================================
             json_small8 * |       8 |     0.026 |    3262 |      - |   306513.4
              json_small16 |       8 |     0.036 |    4512 |  1.383 |   221606.6
@@ -83,7 +83,7 @@ Compared to picojson and nlohmannjson.
 
 ### Medium JSON
 
-   Name (baseline is *)   |   Dim   |  Total ms |  ns/op  |Baseline| Ops/second
+#### Name (baseline is *)   |   Dim   |  Total ms |  ns/op  |Baseline| Ops/second
 ===============================================================================
           json_medium16 * |       8 |     0.075 |    9437 |      - |   105960.3
             json_medium32 |       8 |     0.143 |   17912 |  1.898 |    55826.9
@@ -110,7 +110,7 @@ Compared to picojson and nlohmannjson.
 
 ### Large JSON
 
-   Name (baseline is *)   |   Dim   |  Total ms |  ns/op  |Baseline| Ops/second
+#### Name (baseline is *)   |   Dim   |  Total ms |  ns/op  |Baseline| Ops/second
 ===============================================================================
            json_large16 * |       8 |     0.197 |   24637 |      - |    40588.5
              json_large32 |       8 |     0.364 |   45512 |  1.847 |    21972.0
