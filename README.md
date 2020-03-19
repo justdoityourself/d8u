@@ -51,7 +51,7 @@ Compared to picojson and nlohmannjson.
 
 ### Small JSON
 
- Name (baseline is *)   |   Dim   |  Total ms |  ns/op  |Baseline| Ops/second
+ Name (baseline is *)   |   Dim   |  ms |  ns/op  |*| Ops/S
 ===============================================================================
             json_small8 * |       8 |     0.026 |    3262 |      - |   306513.4
              json_small16 |       8 |     0.036 |    4512 |  1.383 |   221606.6
