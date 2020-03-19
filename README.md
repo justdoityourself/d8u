@@ -43,7 +43,7 @@ int nested_int1 = nested_object["nested"]; // this one performs better if you ar
 
 ```
 
-#Benchmarks
+### Benchmarks
 
 There are 3 variations of JsonReader: JsonReaderS, JsonReader and JsonReaderL. Each of them has different maximum json string parse lengths. This is designed to further optimise performance for your use case, if you know you the max length of the json string you are parsing you can choose the one that best matches your situation.
 
