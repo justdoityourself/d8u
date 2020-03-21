@@ -321,6 +321,12 @@ namespace d8u
 				throw std::runtime_error("Decode Error");
 		}
 
+		template <typename T> DefaultHash& id_block(const T& buffer)
+		{
+			auto phash = (DefaultHash*) (buffer.end() - sizeof(DefaultHash)*2);
+			return *phash;
+		}
+
 		template <typename T> bool validate_block(const T & buffer)
 		{
 			auto data = span<const uint8_t>(buffer.data(), buffer.size() - sizeof(DefaultHash) * 2);

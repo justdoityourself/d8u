@@ -54,6 +54,14 @@ namespace d8u
 				std::this_thread::sleep_for(std::chrono::milliseconds(10));
 		}
 
+		void fast_wait_inc(std::atomic<size_t>& A, size_t M = 1)
+		{
+			while (A.load() >= M)
+				std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
+			A++; // yes there is a race condition here, this function is not intended to prevent a race.
+		}
+
 		void slow_wait(std::atomic<size_t>& A, size_t M=1)
 		{
 			while (A.load() >= M)
