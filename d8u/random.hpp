@@ -22,6 +22,25 @@ namespace d8u
 			return result % max;
 		}
 
+		char Char()
+		{
+			return "abcdefghijklmnopqrstuvwxyzABDREFGHIJKLMNOPQRSTUVWXYZ"[Integer(52)];
+		}
+
+		std::string Word(size_t max = 16)
+		{
+			auto length = Integer(max);
+
+			if (length == 0) length = 1;
+
+			std::string result;
+
+			for (size_t i = 0; i < length; i++)
+				result += Char();
+
+			return result;
+		}
+
 		bool Flip() { return (Integer() % 2) == 0; }
 
 		template < typename T > vector<T> Vector(size_t size)

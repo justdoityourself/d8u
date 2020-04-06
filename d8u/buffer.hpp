@@ -10,6 +10,16 @@
 
 namespace d8u
 {
+	template < typename C> gsl::span<uint8_t> byte_buffer(C& buffer)
+	{
+		return gsl::span<uint8_t>((uint8_t*)buffer.data(), buffer.size() * sizeof(C::value_type));
+	}
+
+	template < typename T, typename C> gsl::span<T> t_buffer(C& buffer)
+	{
+		return gsl::span<T>((T*)buffer.data(), buffer.size() * sizeof(C::value_type) / sizeof(T));
+	}
+
 	namespace buffer
 	{
 		class Helper
