@@ -285,6 +285,21 @@ namespace d8u
 			return key;
 		}
 
+		template <typename INB> auto encode2_span(const INB& span, const DefaultHash& key, const DefaultHash& id, int level = 5)
+		{
+			auto buffer = compress2(span, level);
+
+			Password pw(key);
+			encrypt(buffer, pw);
+
+			DefaultHash check(buffer);
+
+			buffer.insert(buffer.end(), id.begin(), id.end());
+			buffer.insert(buffer.end(), check.begin(), check.end());
+
+			return std::make_pair(key,buffer);
+		}
+
 		template <typename D, typename IN_OUT> DefaultHash encode(const D& domain, IN_OUT& buffer, int level = 5)
 		{
 			DefaultHash key, id;
