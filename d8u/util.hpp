@@ -48,6 +48,12 @@ namespace d8u
 			~dec_scope() { t--; }
 		};
 
+		void fast_until(std::atomic<size_t>& A, size_t M = 1)
+		{
+			while (A.load() != M)
+				std::this_thread::sleep_for(std::chrono::milliseconds(10));
+		}
+
 		void fast_wait(std::atomic<size_t> & A, size_t M=1)
 		{
 			while (A.load() >= M)

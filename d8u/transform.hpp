@@ -176,18 +176,37 @@ namespace d8u
 			cfbDecryption.ProcessData(butter_to_decrypt.data(), butter_to_decrypt.data(), butter_to_decrypt.size());
 		}
 
-		/*void gzip(vector<uint8_t>& m, int level = 5)
+		void gzip_compress(vector<uint8_t>& m, int level = 5)
 		{
-			CryptoPP::Gzip zipper(nullptr,level);    // 1 is fast, 9 is slow
-
-			zipper.Put(m.data(), m.size());
+			CryptoPP::Gzip zipper(nullptr,level);
+			zipper.Put((CryptoPP::byte*)m.data(), m.size());
 			zipper.MessageEnd();
 
-			m.resize(zipper.MaxRetrieveable());
-			zipper.Get(m.data(), m.size());
-		}*/
+			auto avail = zipper.MaxRetrievable();
+			if (avail)
+			{
+				m.resize(avail+sizeof(uint32_t));
+				auto pdesc = (uint32_t*)(m.data() + m.size() - sizeof(uint32_t));
+				*pdesc = (uint32_t)avail;
+				*pdesc |= 0x01000000; //GZIP
+
+				zipper.Get((CryptoPP::byte*)m.data(), m.size()-sizeof(uint32_t));
+			}
+		}
+
+		void gzip_decompress(vector<uint8_t>& m)
+		{
+			uint32_t fin_l = *(uint32_t*)(m.data() + m.size() - sizeof(uint32_t));
+			fin_l &= 0x00ffffff;
+
+			vector<uint8_t> result(fin_l);
+
+			CryptoPP::ArraySource as(m.data(), m.size()-sizeof(uint32_t),true, new CryptoPP::Gunzip(new CryptoPP::ArraySink(result.data(),result.size())));
+
+			m = std::move(result);
+		}
 		
-		void compress(vector<uint8_t> & m, int level = 5)
+		void lzma_compress(vector<uint8_t> & m, int level = 5)
 		{
 			std::array<uint8_t, LZMA_PROPS_SIZE> props;
 			size_t prop = LZMA_PROPS_SIZE;
@@ -209,7 +228,7 @@ namespace d8u
 			}
 		}
 
-		template < typename T > vector<uint8_t> compress2(const T& m, int level = 5)
+		template < typename T > vector<uint8_t> lzma_compress2(const T& m, int level = 5)
 		{
 			std::array<uint8_t, LZMA_PROPS_SIZE> props;
 			size_t prop = LZMA_PROPS_SIZE;
@@ -234,7 +253,7 @@ namespace d8u
 			return result;
 		}
 
-		void decompress(vector<uint8_t> & m)
+		void lzma_decompress(vector<uint8_t> & m)
 		{
 			std::array<uint8_t, LZMA_PROPS_SIZE> props = { 93,0,16,0,0 };
 
@@ -255,6 +274,37 @@ namespace d8u
 				throw std::runtime_error("Decryption Error");
 			
 			m = std::move(result);
+		}
+
+		void compress(vector<uint8_t>& m, int _level = 5)
+		{
+			auto algorithm = _level / 10;
+			auto level = _level % 10;
+
+			switch (algorithm)
+			{
+			default:
+			case 0:
+				return lzma_compress(m, level);
+			case 1:
+				return gzip_compress(m, level);
+			}
+		}
+
+		void decompress(vector<uint8_t>& m)
+		{
+			uint32_t fin_l = *(uint32_t*)(m.data() + m.size() - sizeof(uint32_t));
+
+			auto algorithm = fin_l >> 24;
+
+			switch (algorithm)
+			{
+			default:
+			case 0:
+				return lzma_decompress(m);
+			case 1:
+				return gzip_decompress(m);
+			}
 		}
 
 		template <typename D, typename T> std::pair<DefaultHash, DefaultHash> identify(const D& domain, const T& buffer)
@@ -285,7 +335,8 @@ namespace d8u
 			return key;
 		}
 
-		template <typename INB> auto encode2_span(const INB& span, const DefaultHash& key, const DefaultHash& id, int level = 5)
+		//Pending compress2 implementation for all algorithms.
+		/*template <typename INB> auto encode2_span(const INB& span, const DefaultHash& key, const DefaultHash& id, int level = 5)
 		{
 			auto buffer = compress2(span, level);
 
@@ -298,7 +349,7 @@ namespace d8u
 			buffer.insert(buffer.end(), check.begin(), check.end());
 
 			return std::make_pair(key,buffer);
-		}
+		}*/
 
 		template <typename D, typename IN_OUT> DefaultHash encode(const D& domain, IN_OUT& buffer, int level = 5)
 		{

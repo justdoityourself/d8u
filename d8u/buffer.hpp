@@ -20,6 +20,16 @@ namespace d8u
 		return gsl::span<T>((T*)buffer.data(), buffer.size() * sizeof(C::value_type) / sizeof(T));
 	}
 
+	template < typename T, typename C> auto t_buffer_copy(C& buffer)
+	{
+		auto _buffer = t_buffer<T>(buffer);
+		std::vector<T> result(_buffer.size());
+
+		std::copy(_buffer.begin(), _buffer.end(), result.begin());
+
+		return result;
+	}
+
 	namespace buffer
 	{
 		class Helper
