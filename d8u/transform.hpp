@@ -185,9 +185,10 @@ namespace d8u
 			auto avail = zipper.MaxRetrievable();
 			if (avail)
 			{
+				uint32_t dsz = m.size();
 				m.resize(avail+sizeof(uint32_t));
 				auto pdesc = (uint32_t*)(m.data() + m.size() - sizeof(uint32_t));
-				*pdesc = (uint32_t)avail;
+				*pdesc = dsz;
 				*pdesc |= 0x01000000; //GZIP
 
 				zipper.Get((CryptoPP::byte*)m.data(), m.size()-sizeof(uint32_t));
