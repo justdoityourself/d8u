@@ -45,6 +45,19 @@ namespace d8u
 			return result;
 		}
 
+		template < typename T > T to_bin_t(std::string_view v)
+		{
+			T result;
+
+			auto vb = d8u::util::to_bin(v);
+			if (vb.size() != sizeof(T))
+				throw std::runtime_error("Bad input key");
+
+			std::copy(vb.begin(), vb.end(), (uint8_t*)&result);
+
+			return result;
+		}
+
 		std::wstring to_wide(std::string_view s)
 		{
 			//This Method, is so slow and uses thread locks
