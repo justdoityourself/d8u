@@ -10,6 +10,22 @@
 
 namespace d8u
 {
+	template <typename T> T swap_endian(T u)
+	{
+		union
+		{
+			T u;
+			unsigned char u8[sizeof(T)];
+		} source, dest;
+
+		source.u = u;
+
+		for (size_t k = 0; k < sizeof(T); k++)
+			dest.u8[k] = source.u8[sizeof(T) - k - 1];
+
+		return dest.u;
+	}
+
 	template < typename C> gsl::span<uint8_t> byte_buffer(C& buffer)
 	{
 		return gsl::span<uint8_t>((uint8_t*)buffer.data(), buffer.size() * sizeof(C::value_type));
