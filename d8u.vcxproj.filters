@@ -197,6 +197,12 @@
     <ClInclude Include="d8u\string.hpp">
       <Filter>d8u</Filter>
     </ClInclude>
+    <ClInclude Include="d8u\encode.hpp">
+      <Filter>d8u</Filter>
+    </ClInclude>
+    <ClInclude Include="d8u\hash.hpp">
+      <Filter>d8u</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />

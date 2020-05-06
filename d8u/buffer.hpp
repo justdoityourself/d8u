@@ -368,5 +368,17 @@ namespace d8u
 
 			return result;
 		}
+
+		template <typename A, typename T, typename ... t_args> size_t join_fixed(A& _array, const T& t, t_args ... args)
+		{
+			size_t sz = _memory_size(t, args...);
+
+			if (sz > _array.size())
+				throw std::runtime_error("Fixed Join Out of Bounds");
+
+			_join_memory(_array, 0, t, args...);
+
+			return sz;
+		}
 	}
 }

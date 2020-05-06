@@ -334,6 +334,8 @@
     <ClInclude Include="catch.hpp" />
     <ClInclude Include="d8u\benchmark.hpp" />
     <ClInclude Include="d8u\buffer.hpp" />
+    <ClInclude Include="d8u\encode.hpp" />
+    <ClInclude Include="d8u\hash.hpp" />
     <ClInclude Include="d8u\json.hpp" />
     <ClInclude Include="d8u\memory.hpp" />
     <ClInclude Include="d8u\string.hpp" />
