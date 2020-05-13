@@ -26,12 +26,17 @@ namespace d8u
 		return dest.u;
 	}
 
+	template <typename T> void swap_endian_inplace(T & u)
+	{
+		u = swap_endian(u);
+	}
+
 	template < typename C> gsl::span<uint8_t> byte_buffer(C& buffer)
 	{
 		return gsl::span<uint8_t>((uint8_t*)buffer.data(), buffer.size() * sizeof(C::value_type));
 	}
 
-	template < typename T, typename C> gsl::span<T> t_buffer(C& buffer)
+	template < typename T, typename C> gsl::span<T> t_buffer(const C& buffer)
 	{
 		return gsl::span<T>((T*)buffer.data(), buffer.size() * sizeof(C::value_type) / sizeof(T));
 	}
@@ -208,6 +213,67 @@ namespace d8u
 				return result;
 			}
 
+			Helper Trim(std::string_view chars)
+			{
+				size_t i;
+				for (i = 0; i < size(); i++)
+				{
+					bool match = false;
+					for (auto c : chars)
+					{
+						if (buffer[i] == c)
+						{
+							match = true;
+							break;
+						}
+					}
+
+					if (!match)
+						break;
+				}
+
+				Seek(i);
+
+				return (*this);
+			}
+
+			Helper TrimTail(std::string_view chars)
+			{
+				size_t i;
+				for (i = size(); i != 0; i--)
+				{
+					bool match = false;
+					for (auto c : chars)
+					{
+						if (buffer[i-1] == c)
+						{
+							match = true;
+							break;
+						}
+					}
+
+					if (!match)
+						break;
+				}
+
+				Shrink(i);
+
+				return (*this);
+			}
+
+			Helper Cleanup(std::string_view chars)
+			{
+				Trim(chars);
+				TrimTail(chars);
+
+				return (*this);
+			}
+
+			Helper GetLine2()
+			{
+				return GetWord('\n');
+			}
+
 			Helper GetWord()
 			{
 				size_t o = 0;
@@ -228,7 +294,7 @@ namespace d8u
 				return result;
 			}
 
-			Helper SkipWord(uint8_t d)
+			Helper SkipWord(uint8_t d=' ')
 			{
 				size_t o = 0;
 				NextString(o, d);
@@ -298,6 +364,12 @@ namespace d8u
 					buffer = gsl::span<uint8_t> ( data() + size(), (size_t)0 );
 				else
 					buffer = gsl::span<uint8_t> (data() + n, size() - n);
+			}
+
+			void Shrink(size_t n)
+			{
+				if (n < size())
+					buffer = gsl::span<uint8_t>(data(), n);
 			}
 
 			operator std::string_view() const
