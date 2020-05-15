@@ -89,6 +89,7 @@ namespace d8u
 
 			uint64_t rem = s1.second;
 
+			size_t i = 0;
 			while (rem)
 			{
 				if (rem < B)
@@ -101,9 +102,17 @@ namespace d8u
 				d2.Read(b2);
 
 				if (!std::equal(b1.begin(), b1.end(), b2.begin()))
+				{
+					auto s1 = to_hex(b1);
+					auto s2 = to_hex(b2);
+					std::ofstream("sample1.txt").write(s1.data(),s1.size());
+					std::ofstream("sample2.txt").write(s2.data(), s2.size());
+
 					return false;
+				}
 
 				rem -= b1.size();
+				i++;
 			}
 
 			return true;

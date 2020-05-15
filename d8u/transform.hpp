@@ -185,7 +185,7 @@ namespace d8u
 			auto avail = zipper.MaxRetrievable();
 			if (avail)
 			{
-				uint32_t dsz = m.size();
+				uint32_t dsz = (uint32_t)m.size();
 				m.resize(avail+sizeof(uint32_t));
 				auto pdesc = (uint32_t*)(m.data() + m.size() - sizeof(uint32_t));
 				*pdesc = dsz;
