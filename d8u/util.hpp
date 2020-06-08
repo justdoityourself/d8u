@@ -105,9 +105,12 @@ namespace d8u
 #if defined ( _WIN32 )
 			{
 				struct _stat64 fileInfo;
-				if (_wstati64(filename.wstring().c_str(), &fileInfo) != 0)
+				auto result = _wstati64(filename.wstring().c_str(), &fileInfo);
+				if (result != 0)
 				{
-					throw std::runtime_error("Failed to get last write time.");
+					std::cout << "Failed to get last write time for file " << filename.string() << " with errno " << result << std::endl;
+					return 0;
+					//throw std::runtime_error("Failed to get last write time.");
 				}
 				return fileInfo.st_mtime;
 			}
