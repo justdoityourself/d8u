@@ -401,5 +401,30 @@ namespace d8u
 
 			return std::equal(check.begin(), check.end(), buffer.end() - sizeof(DefaultHash));
 		}
+
+		class Audit
+		{
+		public:
+
+			void IO(uint32_t cluster, const d8u::transform::DefaultHash& block)
+			{
+				for (size_t i = 0; i < sum.size(); i++)
+					sum[(i + cluster) % sum.size()] ^= block[i];
+			}
+
+			void operator += (const Audit& r)
+			{
+				for (size_t i = 0; i < sum.size(); i++)
+					sum[i] ^= r.sum[i];
+			}
+
+			bool operator ==(const Audit& r) const
+			{
+				return std::equal(sum.begin(),sum.end(),r.sum.begin());
+			}
+
+		private:
+			std::array<uint8_t, 32> sum = { 0 };
+		};
 	}
 }

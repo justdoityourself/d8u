@@ -51,9 +51,11 @@ namespace d8u
 				if (e.is_directory())
 					continue;
 
-				if(F==1)
-				if (!files(e.path().string(), string(t) + "\\" + e.path().string()))
-					return false;
+				if (F == 1)
+				{
+					if (!files(e.path().string(), string(t) + "\\" + e.path().string()))
+						return false;
+				}
 				else
 				{
 					fast_wait(threads, F);
@@ -75,21 +77,68 @@ namespace d8u
 			return result;
 		}
 
-		template<typename D1, typename D2> bool devices(const D1& d1, upair<uint64_t> s1, const D2& d2, upair<uint64_t> s2)
+		bool volumes(std::string_view o, std::string_view t, size_t F = 1)
 		{
-			if (s1.second != s2.second)
+			std::atomic<size_t> threads = 0;
+
+			bool result = true;
+			for (auto& e : std::filesystem::recursive_directory_iterator(o, std::filesystem::directory_options::skip_permission_denied))
+			{
+				if (!result)
+					break;
+
+				if (e.is_directory())
+					continue;
+
+				if (F == 1)
+				{
+					auto s1 = e.path().string(), s2 = s1;
+					s2[0] = t[0];
+					if (!files(s1, s2))
+						return false;
+				}
+				else
+				{
+					fast_wait(threads, F);
+
+					threads++;
+
+					std::thread([&](std::string s)
+						{
+							if (!files(s, string(t) + "\\" + s))
+								result = false;
+
+							threads--;
+						}, e.path().string()).detach();
+
+						slow_wait(threads);
+				}
+			}
+
+			return result;
+		}
+
+		template<typename D1, typename D2> bool devices(const D1& d1, upair<uint64_t> seg1, const D2& d2, upair<uint64_t> seg2,std::string * report=nullptr)
+		{
+			if (seg1.second != seg2.second)
+			{
+				if (report)
+					*report += "Device size mismatch";
+
 				return false;
+			}
 
 			constexpr size_t B = 1024 * 1024;
 
 			std::vector<uint8_t> b1(B), b2(B);
 
-			d1.Seek(s1.first);
-			d2.Seek(s2.first);
+			d1.Seek(seg1.first);
+			d2.Seek(seg2.first);
 
-			uint64_t rem = s1.second;
+			uint64_t rem = seg1.second;
 
 			size_t i = 0;
+			size_t total_bad = 0;
 			while (rem)
 			{
 				if (rem < B)
@@ -103,17 +152,46 @@ namespace d8u
 
 				if (!std::equal(b1.begin(), b1.end(), b2.begin()))
 				{
-					auto s1 = to_hex(b1);
-					auto s2 = to_hex(b2);
-					std::ofstream("sample1.txt").write(s1.data(),s1.size());
-					std::ofstream("sample2.txt").write(s2.data(), s2.size());
+					if (report)
+					{
+						size_t start = -1;
+						size_t length = 0;
 
-					return false;
+						for (size_t j = 0; j < b1.size() / 4096; j++)
+						{
+							if (!std::equal(b1.begin() + j * 4096, b1.begin() + (j+1) * 4096, b2.begin() + j * 4096))
+							{
+								if (start == -1)
+									start = i*256 + j;
+								length++;
+							}
+							else if (length)
+							{
+								*report += std::string("Cluster: ") + std::to_string(start) + "," + std::to_string(length) + "\n";
+								start = -1;
+								total_bad += length;
+								length = 0;
+							}
+						}
+
+						if (length)
+						{
+							*report += std::string("Cluster: ") + std::to_string(start) + "," + std::to_string(length) + "\n";
+							start = -1;
+							total_bad += length;
+							length = 0;
+						}
+					}
+					else
+						return false;
 				}
 
 				rem -= b1.size();
 				i++;
 			}
+
+			if(report && total_bad)
+				*report += std::string("Total: ") + std::to_string(total_bad) + "\n";
 
 			return true;
 		}
