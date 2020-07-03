@@ -38,6 +38,23 @@ namespace d8u
 			return std::equal(file1.begin(), file1.end(), file2.begin());
 		}
 
+		bool files_bytes2(std::string_view o, std::string_view t)
+		{
+			auto file1 = mio::mmap_source(o);
+			auto file2 = mio::mmap_source(t);
+
+			if (file1.size() != file2.size())
+				return false;
+
+			for (size_t i = 0; i < file1.size(); i++)
+			{
+				if (file1[i] != file2[i])
+					return false;
+			}
+
+			return true;
+		}
+
 		bool folders(std::string_view o, std::string_view t,size_t F = 1)
 		{
 			std::atomic<size_t> threads = 0;
