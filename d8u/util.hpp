@@ -145,6 +145,7 @@ namespace d8u
 			size_t threads;
 			size_t files;
 			size_t items;
+			size_t memory;
 		};
 
 		struct Atomic
@@ -160,6 +161,7 @@ namespace d8u
 			std::atomic<size_t> threads;
 			std::atomic<size_t> files;
 			std::atomic<size_t> items;
+			std::atomic<size_t> memory;
 		};
 
 		struct Statistics
@@ -217,6 +219,7 @@ namespace d8u
 				direct.queries = 0;
 				direct.files = 0;
 				direct.items = 0;
+				direct.memory = 0;
 			}
 
 			void operator += (const Statistics& r)

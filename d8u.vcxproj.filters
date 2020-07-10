@@ -19,6 +19,9 @@
     <Filter Include="Source Files\lzma">
       <UniqueIdentifier>{a1c5d6f0-5ce4-4246-ab3d-d514d0d59e94}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\zopfli">
+      <UniqueIdentifier>{63bb105a-d553-4b91-a9c0-252622cffff1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="d8u.cpp">
@@ -159,6 +162,45 @@
     <ClCompile Include="..\common\LZMA19.00\LZMA\XzIn.c">
       <Filter>Source Files\lzma</Filter>
     </ClCompile>
+    <ClCompile Include="..\common\zopfli\zopfli\blocksplitter.c">
+      <Filter>Source Files\zopfli</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\zopfli\zopfli\cache.c">
+      <Filter>Source Files\zopfli</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\zopfli\zopfli\deflate.c">
+      <Filter>Source Files\zopfli</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\zopfli\zopfli\gzip_container.c">
+      <Filter>Source Files\zopfli</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\zopfli\zopfli\hash.c">
+      <Filter>Source Files\zopfli</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\zopfli\zopfli\katajainen.c">
+      <Filter>Source Files\zopfli</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\zopfli\zopfli\lz77.c">
+      <Filter>Source Files\zopfli</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\zopfli\zopfli\squeeze.c">
+      <Filter>Source Files\zopfli</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\zopfli\zopfli\tree.c">
+      <Filter>Source Files\zopfli</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\zopfli\zopfli\util.c">
+      <Filter>Source Files\zopfli</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\zopfli\zopfli\zlib_container.c">
+      <Filter>Source Files\zopfli</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\zopfli\zopfli\zopfli_bin.c">
+      <Filter>Source Files\zopfli</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\zopfli\zopfli\zopfli_lib.c">
+      <Filter>Source Files\zopfli</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="d8u\json.hpp">
@@ -205,6 +247,48 @@
     </ClInclude>
     <ClInclude Include="d8u\cmd.hpp">
       <Filter>d8u</Filter>
+    </ClInclude>
+    <ClInclude Include="d8u\win32_misc.h">
+      <Filter>d8u</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\zopfli\zopfli\blocksplitter.h">
+      <Filter>Source Files\zopfli</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\zopfli\zopfli\cache.h">
+      <Filter>Source Files\zopfli</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\zopfli\zopfli\deflate.h">
+      <Filter>Source Files\zopfli</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\zopfli\zopfli\gzip_container.h">
+      <Filter>Source Files\zopfli</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\zopfli\zopfli\hash.h">
+      <Filter>Source Files\zopfli</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\zopfli\zopfli\katajainen.h">
+      <Filter>Source Files\zopfli</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\zopfli\zopfli\lz77.h">
+      <Filter>Source Files\zopfli</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\zopfli\zopfli\squeeze.h">
+      <Filter>Source Files\zopfli</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\zopfli\zopfli\symbols.h">
+      <Filter>Source Files\zopfli</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\zopfli\zopfli\tree.h">
+      <Filter>Source Files\zopfli</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\zopfli\zopfli\util.h">
+      <Filter>Source Files\zopfli</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\zopfli\zopfli\zlib_container.h">
+      <Filter>Source Files\zopfli</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\zopfli\zopfli\zopfli.h">
+      <Filter>Source Files\zopfli</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

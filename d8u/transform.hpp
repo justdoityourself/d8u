@@ -5,13 +5,15 @@
 #include <array>
 #include <vector>
 
-#include "cryptopp/sha.h"
+#include "hash.hpp"
+
 #include "cryptopp/aes.h"
 #include "cryptopp/modes.h"
 #include "cryptopp/gzip.h"
 
 
 #include "lzma/lzmalib.h"
+//#include "zopfli/zopfli.h"
 
 #include "../gsl-lite.hpp"
 
@@ -23,135 +25,6 @@ namespace d8u
 
 		using std::array;
 		using std::vector;
-
-		template <typename T, typename Y> void default_hash(const T& input_buffer, Y& output_buffer)
-		{
-			CryptoPP::SHA256().CalculateDigest(output_buffer.data(), (const CryptoPP::byte*) input_buffer.data(), input_buffer.size());
-		}
-
-		template <typename T, typename Y> void long_hash(const T& input_buffer, Y& output_buffer)
-		{
-			CryptoPP::SHA512().CalculateDigest(output_buffer.data(), (const CryptoPP::byte*)input_buffer.data(), input_buffer.size());
-		}
-
-#pragma pack ( push, 1 )
-
-		class HashState;
-
-		class DefaultHash : public array<uint8_t,32>
-		{
-		public:
-
-			DefaultHash() {}
-
-			void Zero()
-			{
-				for (auto& e : (*this))
-					e = 0;
-			}
-
-			bool IsZero() const
-			{
-				for (auto& e : (*this))
-				{
-					if (e != 0)
-						return false;
-				}
-
-				return true;
-			}
-
-			template <typename T> DefaultHash(const T & data)
-			{
-				default_hash(data, *this);
-			}
-
-			template <typename D, typename T> DefaultHash(const D & domain, const T& data)
-			{
-				HashState state;
-				state.Update(domain);
-				state.Update(data);
-				*this = state.Finish();
-			}
-
-			template <typename T> void Hash(const T& data)
-			{
-				default_hash(data, *this);
-			}
-
-			void Iterate()
-			{
-				default_hash(*this, *this);
-			}
-
-			DefaultHash Next() const
-			{
-				DefaultHash res;
-				res.Hash(*this);
-				return res;
-			}
-		};
-
-		class HashState
-		{
-		public:
-
-			template<typename T> void Update(T& r)
-			{
-				state.Update(r.data(), r.size());
-			}
-
-			void Finish(DefaultHash & finish)
-			{
-				state.Final(finish.data());
-			}
-
-			DefaultHash Finish()
-			{
-				DefaultHash finish;
-
-				state.Final(finish.data());
-
-				return finish;
-			}
-
-			CryptoPP::SHA256 state;
-		};
-
-
-		class Password : public array<uint8_t,64>
-		{
-		public:
-			~Password()
-			{
-				for (auto& e : (*this))
-					e = 0;
-			}
-
-			Password(){}
-
-			template<typename T> Password(const T& r)
-			{
-				long_hash(r, *this);
-			}
-
-			void Iterate()
-			{
-				long_hash(*this, *this);
-			}
-
-			const uint8_t* Key() const
-			{
-				return data();
-			}
-
-			const uint8_t * IV() const
-			{
-				return data() + 32;
-			}
-		};
-
-#pragma pack ( pop )
 
 		template <typename T> void encrypt(T& buffer_to_encrypt, const Password& password)
 		{
@@ -195,6 +68,29 @@ namespace d8u
 			}
 		}
 
+		template < typename T > vector<uint8_t> gzip_compress2(const T & m, int level = 5)
+		{
+			vector<uint8_t> r;
+
+			CryptoPP::Gzip zipper(nullptr, level);
+			zipper.Put((CryptoPP::byte*)m.data(), m.size());
+			zipper.MessageEnd();
+
+			auto avail = zipper.MaxRetrievable();
+			if (avail)
+			{
+				uint32_t dsz = (uint32_t)m.size();
+				r.resize(avail + sizeof(uint32_t));
+				auto pdesc = (uint32_t*)(r.data() + r.size() - sizeof(uint32_t));
+				*pdesc = dsz;
+				*pdesc |= 0x01000000; //GZIP
+
+				zipper.Get((CryptoPP::byte*)r.data(), r.size() - sizeof(uint32_t));
+			}
+
+			return r;
+		}
+
 		void gzip_decompress(vector<uint8_t>& m)
 		{
 			uint32_t fin_l = *(uint32_t*)(m.data() + m.size() - sizeof(uint32_t));
@@ -205,6 +101,25 @@ namespace d8u
 			CryptoPP::ArraySource as(m.data(), m.size()-sizeof(uint32_t),true, new CryptoPP::Gunzip(new CryptoPP::ArraySink(result.data(),result.size())));
 
 			m = std::move(result);
+		}
+
+		void zopfli_compress(vector<uint8_t>& m, int level = 5)
+		{
+			throw "todo";
+
+			/*ZopfliOptions o;
+			ZopfliInitOptions(&o);
+			size_t r = 0;
+			unsigned char* buffer = nullptr;
+			ZopfliCompress(&o, ZOPFLI_FORMAT_GZIP, m.data(), m.size(), &buffer, &r);
+			m.resize(r);
+			std::memcpy(m.data(), buffer, r);
+			free(buffer);*/
+		}
+
+		void zopfli_decompress(vector<uint8_t>& m)
+		{
+			throw "todo";
 		}
 		
 		void lzma_compress(vector<uint8_t> & m, int level = 5)
@@ -246,7 +161,7 @@ namespace d8u
 			else
 			{
 				result.resize(m.size());
-				std::copy(m.begin(), m.end(), result.begin());
+				std::copy(m.data(), m.data() + m.size(), result.begin());
 				uint32_t l = (uint32_t)m.size();
 				result.insert(result.end(), (uint8_t*)&l, ((uint8_t*)&l) + sizeof(uint32_t));
 			}
