@@ -105,7 +105,7 @@ namespace d8u
 #if defined ( _WIN32 )
 			{
 				struct _stat64 fileInfo;
-				auto result = _wstati64(filename.wstring().c_str(), &fileInfo);
+				auto result = _wstati64((std::wstring(L"\\\\?\\")+filename.wstring()).c_str(), &fileInfo);
 				if (result != 0)
 				{
 					std::cout << "Failed to get last write time for file " << filename.string() << " with errno " << result << std::endl;
