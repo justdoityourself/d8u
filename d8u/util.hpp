@@ -29,6 +29,8 @@
 #include "Objbase.h"
 #endif
 
+#include "string.hpp"
+
 namespace d8u
 {
 	#define self_t (*this)
@@ -99,6 +101,35 @@ namespace d8u
 #if defined ( _WIN32 )
 #include <sys/stat.h>
 #endif
+
+		uint64_t GetFileSize(std::string_view name)
+		{
+			uint64_t size = 0;
+			
+			try
+			{
+				size = std::filesystem::file_size(name);
+			}
+			catch (...)
+			{
+#if defined ( _WIN32 )
+				{
+					struct _stat64 fileInfo;
+					auto result = _wstati64((std::wstring(L"\\\\?\\") + to_wide(name)).c_str(), &fileInfo);
+					if (result != 0)
+					{
+						std::cout << "Failed to get size for file " << name << " with errno " << result << std::endl;
+						return 0;
+					}
+					size = fileInfo.st_size;
+				}
+#else
+				throw;
+#endif
+			}
+
+			return size;
+		}
 
 		std::time_t GetFileWriteTime(const std::filesystem::path& filename)
 		{
