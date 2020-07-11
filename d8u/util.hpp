@@ -177,6 +177,7 @@ namespace d8u
 			size_t files;
 			size_t items;
 			size_t memory;
+			size_t connections;
 		};
 
 		struct Atomic
@@ -193,6 +194,7 @@ namespace d8u
 			std::atomic<size_t> files;
 			std::atomic<size_t> items;
 			std::atomic<size_t> memory;
+			std::atomic<size_t> connections;
 		};
 
 		struct Statistics
@@ -212,22 +214,27 @@ namespace d8u
 
 					std::cout << "" << p << "% ";
 				}
+
 				if(direct.threads) 
-					std::cout << "Threads " << direct.threads << " ";
+					std::cout << "T " << direct.threads << " ";
 				if(direct.files) 
-					std::cout << "Handles " << direct.files << " ";
-				if (direct.items) 
-					std::cout << "Files " << direct.items << " ";
+					std::cout << "H " << direct.files << " ";
+				if (direct.connections)
+					std::cout << "Conns " << direct.connections << " ";
+				if (direct.memory)
+					std::cout << "MMIO " << direct.memory / (1024 * 1024) << "MB ";
 				if (direct.blocks) 
-					std::cout << "Blocks " << direct.blocks << " ";
+					std::cout << "BLK " << direct.blocks << " ";
 				if (direct.queries) 
-					std::cout << "Queries " << direct.queries << " ";
+					std::cout << "Q " << direct.queries << " ";
+				if (direct.items)
+					std::cout << "FT " << direct.items << " ";
 				if (direct.read)
-					std::cout << "Read " << direct.read << " ";
-				if (direct.write) 
-					std::cout << "Write " << direct.write << " ";
-				if (direct.duplicate) 
-					std::cout << "Duplicate " << direct.duplicate << " ";
+					std::cout << "RIO " << direct.read / (1024*1024) << "MB ";
+				if (direct.write)
+					std::cout << "WIO " << direct.write / (1024 * 1024) << "MB ";
+				if (direct.duplicate)
+					std::cout << "DIO " << direct.duplicate / (1024 * 1024) << "MB ";
 			}
 
 			static_assert(sizeof(uint64_t) == sizeof(std::atomic<uint64_t>));
@@ -251,6 +258,7 @@ namespace d8u
 				direct.files = 0;
 				direct.items = 0;
 				direct.memory = 0;
+				direct.connections = 0;
 			}
 
 			void operator += (const Statistics& r)
