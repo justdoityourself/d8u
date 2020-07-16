@@ -136,13 +136,26 @@ namespace d8u
 #if defined ( _WIN32 )
 			{
 				struct _stat64 fileInfo;
-				auto result = _wstati64((std::wstring(L"\\\\?\\")+filename.wstring()).c_str(), &fileInfo);
-				if (result != 0)
+				try
 				{
-					std::cout << "Failed to get last write time for file " << filename.string() << " with errno " << result << std::endl;
-					return 0;
-					//throw std::runtime_error("Failed to get last write time.");
+					auto result = _stati64(filename.string().c_str(), &fileInfo);
+					if (result != 0)
+					{
+						throw "unicode exception or file not found";
+					}
 				}
+				catch (...)
+				{
+					auto result = _wstati64((std::wstring(L"\\\\?\\") + filename.wstring()).c_str(), &fileInfo);
+					if (result != 0)
+					{
+						std::cout << "Failed to get last write time for file " << filename.string() << " with errno " << result << std::endl;
+						return 0;
+						//throw std::runtime_error("Failed to get last write time.");
+					}
+				}
+
+
 				return fileInfo.st_mtime;
 			}
 #else
@@ -178,6 +191,7 @@ namespace d8u
 			size_t items;
 			size_t memory;
 			size_t connections;
+			size_t sequence;
 		};
 
 		struct Atomic
@@ -195,6 +209,7 @@ namespace d8u
 			std::atomic<size_t> items;
 			std::atomic<size_t> memory;
 			std::atomic<size_t> connections;
+			std::atomic<size_t> sequence;
 		};
 
 		struct Statistics
@@ -206,23 +221,6 @@ namespace d8u
 
 			void Print()
 			{
-				if (direct.target)
-				{
-					auto p = (double)direct.read / (double)direct.target * 100;
-					if (p > 100)
-						p = 100;
-
-					std::cout << "" << p << "% ";
-				}
-
-				if(direct.threads) 
-					std::cout << "T " << direct.threads << " ";
-				if(direct.files) 
-					std::cout << "H " << direct.files << " ";
-				if (direct.connections)
-					std::cout << "Conns " << direct.connections << " ";
-				if (direct.memory)
-					std::cout << "MMIO " << direct.memory / (1024 * 1024) << "MB ";
 				if (direct.blocks) 
 					std::cout << "BLK " << direct.blocks << " ";
 				if (direct.queries) 
@@ -235,6 +233,24 @@ namespace d8u
 					std::cout << "WIO " << direct.write / (1024 * 1024) << "MB ";
 				if (direct.duplicate)
 					std::cout << "DIO " << direct.duplicate / (1024 * 1024) << "MB ";
+
+				if (direct.threads)
+					std::cout << "T " << direct.threads << " ";
+				if (direct.files)
+					std::cout << "H " << direct.files << " ";
+				if (direct.connections)
+					std::cout << "Conns " << direct.connections << " ";
+				if (direct.memory)
+					std::cout << "MMIO " << direct.memory / (1024 * 1024) << "MB ";
+
+				if (direct.target)
+				{
+					auto p = (double)direct.read / (double)direct.target * 100;
+					if (p > 100)
+						p = 100;
+
+					std::cout << "" << p << "% ";
+				}
 			}
 
 			static_assert(sizeof(uint64_t) == sizeof(std::atomic<uint64_t>));
@@ -259,6 +275,7 @@ namespace d8u
 				direct.items = 0;
 				direct.memory = 0;
 				direct.connections = 0;
+				direct.sequence = 0;
 			}
 
 			void operator += (const Statistics& r)
@@ -275,7 +292,7 @@ namespace d8u
 			}
 		};
 
-		constexpr std::array<uint8_t, 16> default_domain = { 0xC5,0x22,0xAC,0xAD,0x91,0xDD,0x42,0xC6,0x90,0xC8,0xEE,0x60,0x82,0x0B,0x18,0x79 };
+		constexpr std::array<uint8_t, 32> default_domain = { 0xC5,0x22,0xAC,0xAD,0x91,0xDD,0x42,0xC6,0x90,0xC8,0xEE,0x60,0x82,0x0B,0x18,0x79,0x8F,0xB4,0x39,0xE9,0x24,0x00,0x48,0xC4,0xB1,0xC9,0x7B,0xC3,0xB0,0xA6,0x66,0xA3 };
 
 		string now()
 		{

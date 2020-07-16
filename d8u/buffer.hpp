@@ -6,6 +6,8 @@
 #include <string_view>
 #include <vector>
 
+#include "memory.hpp"
+
 #include "../gsl-lite.hpp"
 
 namespace d8u
@@ -432,9 +434,9 @@ namespace d8u
 			_join_memory(m, offset + t.size(), args...);
 		}
 
-		template <typename T, typename ... t_args> std::vector<uint8_t> join_memory(const T& t, t_args ... args)
+		template <typename T, typename ... t_args> d8u::sse_vector join_memory(const T& t, t_args ... args)
 		{
-			std::vector<uint8_t> result( _memory_size(t, args...) );
+			d8u::sse_vector result( _memory_size(t, args...) );
 
 			_join_memory(result,0,t, args...);
 

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "cryptopp/sha.h"
+#include "../gsl-lite.hpp"
 
 namespace d8u
 {
@@ -13,25 +14,23 @@ namespace d8u
 		using std::array;
 		using std::vector;
 
-		template <typename T, typename Y> void default_hash(const T& input_buffer, Y& output_buffer)
+		template <typename T, typename Y> void _default_hash(const T& input_buffer, Y& output_buffer)
 		{
 			CryptoPP::SHA256().CalculateDigest(output_buffer.data(), (const CryptoPP::byte*) input_buffer.data(), input_buffer.size());
 		}
 
-		template <typename T, typename Y> void long_hash(const T& input_buffer, Y& output_buffer)
+		template <typename T, typename Y> void _long_hash(const T& input_buffer, Y& output_buffer)
 		{
 			CryptoPP::SHA512().CalculateDigest(output_buffer.data(), (const CryptoPP::byte*)input_buffer.data(), input_buffer.size());
 		}
 
 #pragma pack ( push, 1 )
 
-		class HashState;
-
-		class DefaultHash : public array<uint8_t, 32>
+		class _DefaultHash : public array<uint8_t, 32>
 		{
 		public:
 
-			DefaultHash() {}
+			_DefaultHash() {}
 
 			void Zero()
 			{
@@ -50,14 +49,14 @@ namespace d8u
 				return true;
 			}
 
-			template <typename T> DefaultHash(const T& data)
+			template <typename T> _DefaultHash(const T& data)
 			{
-				default_hash(data, *this);
+				_default_hash(data, *this);
 			}
 
-			template <typename D, typename T> DefaultHash(const D& domain, const T& data)
+			template <typename D, typename T> _DefaultHash(const D& domain, const T& data)
 			{
-				HashState state;
+				State state;
 				state.Update(domain);
 				state.Update(data);
 				*this = state.Finish();
@@ -65,48 +64,53 @@ namespace d8u
 
 			template <typename T> void Hash(const T& data)
 			{
-				default_hash(data, *this);
+				_default_hash(data, *this);
 			}
 
-			void Iterate()
+			_DefaultHash GetNext() const
 			{
-				default_hash(*this, *this);
+				_DefaultHash result;
+
+				_default_hash(*this, result);
+
+				return result;
 			}
 
-			DefaultHash Next() const
+			class State
 			{
-				DefaultHash res;
-				res.Hash(*this);
-				return res;
-			}
+			public:
+
+				template<typename T> void Update(T& r)
+				{
+					state.Update(r.data(), r.size());
+				}
+
+				void Finish(_DefaultHash& finish)
+				{
+					state.Final(finish.data());
+				}
+
+				_DefaultHash Finish()
+				{
+					_DefaultHash finish;
+
+					state.Final(finish.data());
+
+					return finish;
+				}
+
+				template < typename T> T FinishT()
+				{
+					T finish;
+
+					state.Final(finish.data());
+
+					return finish;
+				}
+
+				CryptoPP::SHA256 state;
+			};
 		};
-
-		class HashState
-		{
-		public:
-
-			template<typename T> void Update(T& r)
-			{
-				state.Update(r.data(), r.size());
-			}
-
-			void Finish(DefaultHash& finish)
-			{
-				state.Final(finish.data());
-			}
-
-			DefaultHash Finish()
-			{
-				DefaultHash finish;
-
-				state.Final(finish.data());
-
-				return finish;
-			}
-
-			CryptoPP::SHA256 state;
-		};
-
 
 		class Password : public array<uint8_t, 64>
 		{
@@ -121,12 +125,12 @@ namespace d8u
 
 			template<typename T> Password(const T& r)
 			{
-				long_hash(r, *this);
+				_long_hash(r, *this);
 			}
 
 			void Iterate()
 			{
-				long_hash(*this, *this);
+				_long_hash(*this, *this);
 			}
 
 			const uint8_t* Key() const
@@ -149,5 +153,124 @@ namespace d8u
 		{
 			CryptoPP::SHA1().CalculateDigest(output_buffer.data(), (const CryptoPP::byte*) input_buffer.data(), input_buffer.size());
 		}
+
+		template <typename T, typename Y> void sha256(const T& input_buffer, Y& output_buffer)
+		{
+			CryptoPP::SHA256().CalculateDigest(output_buffer.data(), (const CryptoPP::byte*) input_buffer.data(), input_buffer.size());
+		}
+
+		template <typename T, typename Y> void sha512(const T& input_buffer, Y& output_buffer)
+		{
+			CryptoPP::SHA512().CalculateDigest(output_buffer.data(), (const CryptoPP::byte*)input_buffer.data(), input_buffer.size());
+		}
+
+		class Sha256State
+		{
+		public:
+
+			template<typename T> void Update(T& r)
+			{
+				state.Update(r.data(), r.size());
+			}
+
+			template < typename T >void Finish(T& finish)
+			{
+				state.Final(finish.data());
+			}
+
+			template<typename T> T Finish()
+			{
+				T finish;
+
+				state.Final(finish.data());
+
+				return finish;
+			}
+
+			CryptoPP::SHA256 state;
+		};
+	}
+
+	namespace custom_hash
+	{
+		using gsl::span;
+
+		using std::array;
+		using std::vector;
+
+#pragma pack ( push, 1 )
+
+		template < typename T > class DefaultHashT alignas(16): public array<uint8_t, T::byte_size>
+		{
+		public:
+			using State = T;
+
+			DefaultHashT() {}
+
+			void Zero()
+			{
+				for (auto& e : (*this))
+					e = 0;
+			}
+
+			bool IsZero() const
+			{
+				for (auto& e : (*this))
+				{
+					if (e != 0)
+						return false;
+				}
+
+				return true;
+			}
+
+			void operator=(const DefaultHashT<T>& r)
+			{
+				std::copy(r.begin(), r.end(), array<uint8_t, T::byte_size>::begin());
+			}
+
+			/*void operator=(const array<uint8_t, T::byte_size>& r)
+			{
+				std::copy(r.begin(), r.end(), array<uint8_t, T::byte_size>::begin());
+			}*/
+
+			DefaultHashT(const DefaultHashT<T>& r)
+			{
+				std::copy(r.begin(), r.end(), array<uint8_t, T::byte_size>::begin());
+			}
+
+			/*explicit DefaultHashT(const array<uint8_t, T::byte_size>& r)
+			{
+				std::copy(r.begin(), r.end(), array<uint8_t, T::byte_size>::begin());
+			}*/
+
+			template <typename B> explicit DefaultHashT(const B& data)
+			{
+				T::hash(data, *this);
+			}
+
+			template <typename D, typename B> DefaultHashT(const D& domain, const B& data)
+			{
+				T state;
+				state.Update(domain);
+				state.Update(data);
+				*this = state.FinishT< DefaultHashT>();
+			}
+
+			template <typename B> void Hash(const B& data)
+			{
+				T::hash(data, *this);
+			}
+
+			DefaultHashT GetNext() const
+			{
+				alignas(16) DefaultHashT result;
+				T::hash(*this, result);
+
+				return result;
+			}
+		};
+
+#pragma pack ( pop )
 	}
 }

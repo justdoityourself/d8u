@@ -6,6 +6,8 @@
 #include <string_view>
 #include <vector>
 
+#include "memory.hpp"
+
 namespace d8u
 {
 	namespace util
@@ -27,6 +29,27 @@ namespace d8u
 		std::vector<uint8_t> to_bin(std::string_view v)
 		{
 			std::vector<uint8_t> result; result.reserve(v.size() / 2 + 1);
+			auto ctoi = [](char c)
+			{
+				if (c >= '0' && c <= '9')
+					return c - '0';
+				if (c >= 'A' && c <= 'F')
+					return c - 'A' + 10;
+				if (c >= 'a' && c <= 'f')
+					return c - 'a' + 10;
+
+				return 0;
+			};
+
+			for (auto c = v.begin(); c < v.end(); c += 2)
+				result.push_back((ctoi(*c) << 4) + ctoi(*(c + 1)));
+
+			return result;
+		}
+
+		sse_vector to_bin_sse(std::string_view v)
+		{
+			sse_vector result; result.reserve(v.size() / 2 + 1);
 			auto ctoi = [](char c)
 			{
 				if (c >= '0' && c <= '9')

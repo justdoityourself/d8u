@@ -14,8 +14,11 @@
 
 #include "lzma/lzmalib.h"
 //#include "zopfli/zopfli.h"
+#include "minilzo/minilzo.h"
 
 #include "../gsl-lite.hpp"
+
+
 
 namespace d8u
 {
@@ -32,9 +35,9 @@ namespace d8u
 			cfbEncryption.ProcessData(buffer_to_encrypt.data(), buffer_to_encrypt.data(), buffer_to_encrypt.size());
 		}
 
-		template <typename T> vector<uint8_t> encrypt_copy(T& buffer_to_encrypt, const Password& password)
+		template <typename T> d8u::sse_vector encrypt_copy(T& buffer_to_encrypt, const Password& password)
 		{
-			vector<uint8_t> output;
+			d8u::sse_vector output;
 			output.resize(buffer_to_encrypt.size());
 
 			CryptoPP::CFB_Mode<CryptoPP::AES>::Encryption cfbEncryption(password.Key(), 32, password.IV());
@@ -49,14 +52,14 @@ namespace d8u
 			cfbDecryption.ProcessData(butter_to_decrypt.data(), butter_to_decrypt.data(), butter_to_decrypt.size());
 		}
 
-		void gzip_compress(vector<uint8_t>& m, int level = 5)
+		void gzip_compress(d8u::sse_vector& m, int level = 5)
 		{
 			CryptoPP::Gzip zipper(nullptr,level);
 			zipper.Put((CryptoPP::byte*)m.data(), m.size());
 			zipper.MessageEnd();
 
 			auto avail = zipper.MaxRetrievable();
-			if (avail)
+			if (avail && avail < m.size())
 			{
 				uint32_t dsz = (uint32_t)m.size();
 				m.resize(avail+sizeof(uint32_t));
@@ -66,18 +69,23 @@ namespace d8u
 
 				zipper.Get((CryptoPP::byte*)m.data(), m.size()-sizeof(uint32_t));
 			}
+			else
+			{
+				uint32_t l = (uint32_t)m.size() | 0x01000000;
+				m.insert(m.end(), (uint8_t*)&l, ((uint8_t*)&l) + sizeof(uint32_t));
+			}
 		}
 
-		template < typename T > vector<uint8_t> gzip_compress2(const T & m, int level = 5)
+		template < typename T > d8u::sse_vector gzip_compress2(const T & m, int level = 5)
 		{
-			vector<uint8_t> r;
+			d8u::sse_vector r;
 
 			CryptoPP::Gzip zipper(nullptr, level);
 			zipper.Put((CryptoPP::byte*)m.data(), m.size());
 			zipper.MessageEnd();
 
 			auto avail = zipper.MaxRetrievable();
-			if (avail)
+			if (avail && avail < m.size())
 			{
 				uint32_t dsz = (uint32_t)m.size();
 				r.resize(avail + sizeof(uint32_t));
@@ -87,47 +95,114 @@ namespace d8u
 
 				zipper.Get((CryptoPP::byte*)r.data(), r.size() - sizeof(uint32_t));
 			}
+			else
+			{
+				r = m;
+				uint32_t l = (uint32_t)r.size() | 0x01000000;
+				r.insert(r.end(), (uint8_t*)&l, ((uint8_t*)&l) + sizeof(uint32_t));
+			}
 
 			return r;
 		}
 
-		void gzip_decompress(vector<uint8_t>& m)
+		void gzip_decompress(d8u::sse_vector& m)
 		{
 			uint32_t fin_l = *(uint32_t*)(m.data() + m.size() - sizeof(uint32_t));
 			fin_l &= 0x00ffffff;
 
-			vector<uint8_t> result(fin_l);
+			if (fin_l == m.size() - sizeof(uint32_t))
+			{
+				m.resize(fin_l);
+				return;
+			}
+
+			d8u::sse_vector result(fin_l);
 
 			CryptoPP::ArraySource as(m.data(), m.size()-sizeof(uint32_t),true, new CryptoPP::Gunzip(new CryptoPP::ArraySink(result.data(),result.size())));
 
 			m = std::move(result);
 		}
 
-		void zopfli_compress(vector<uint8_t>& m, int level = 5)
+		/*void zopfli_compress(d8u::sse_vector& m, int level = 5)
 		{
-			throw "todo";
-
-			/*ZopfliOptions o;
+			ZopfliOptions o;
 			ZopfliInitOptions(&o);
 			size_t r = 0;
 			unsigned char* buffer = nullptr;
 			ZopfliCompress(&o, ZOPFLI_FORMAT_GZIP, m.data(), m.size(), &buffer, &r);
 			m.resize(r);
 			std::memcpy(m.data(), buffer, r);
-			free(buffer);*/
+			free(buffer);
 		}
 
-		void zopfli_decompress(vector<uint8_t>& m)
+		void zopfli_decompress(d8u::sse_vector& m)
 		{
 			throw "todo";
+		}*/
+
+		class MiniLZO
+		{
+		public:
+			MiniLZO() 
+			{ 
+				if (lzo_init() != LZO_E_OK) 
+					throw std::runtime_error("Failed to start MINILZO"); 
+			}
+			~MiniLZO() {}
+		};
+
+		void minilzo_decompress(d8u::sse_vector& m)
+		{
+			static MiniLZO Context;
+
+			uint32_t fin_l = *(uint32_t*)(m.data() + m.size() - sizeof(uint32_t));
+			fin_l &= 0x00ffffff;
+
+			if (fin_l == m.size() - sizeof(uint32_t))
+			{
+				m.resize(fin_l);
+				return;
+			}
+
+			d8u::sse_vector result(fin_l);
+
+			lzo_uint output_length = (lzo_uint)result.size();
+			if (LZO_E_OK != lzo1x_decompress((uint8_t*)m.data(), (lzo_uint)m.size() - sizeof(uint32_t), result.data(), &output_length, NULL) || output_length != result.size()) 
+				throw std::runtime_error("LZMA Decompression Error");
+
+			m = std::move(result);
+		}
+
+		void minilzo_compress(d8u::sse_vector& m, int level = 5)
+		{
+			static MiniLZO Context;
+
+			std::array<uint8_t, LZO1X_1_MEM_COMPRESS> workspace;
+
+			d8u::sse_vector result(m.size() + 1024 * 65);
+
+			lzo_uint output_length = (lzo_uint)m.size() + 1024;
+			if (LZO_E_OK != lzo1x_1_compress((uint8_t*)m.data(), (lzo_uint)m.size(), result.data(), &output_length, workspace.data()))
+				output_length = result.size();
+
+			uint32_t l = (uint32_t)m.size() | 0x02000000;
+
+			if (output_length >= m.size())
+				m.insert(m.end(), (uint8_t*)&l, ((uint8_t*)&l) + sizeof(uint32_t));
+			else
+			{
+				result.resize(output_length);
+				result.insert(result.end(), (uint8_t*)&l, ((uint8_t*)&l) + sizeof(uint32_t));
+				m = std::move(result);
+			}
 		}
 		
-		void lzma_compress(vector<uint8_t> & m, int level = 5)
+		void lzma_compress(d8u::sse_vector & m, int level = 5)
 		{
 			std::array<uint8_t, LZMA_PROPS_SIZE> props;
 			size_t prop = LZMA_PROPS_SIZE;
 			size_t fin_l = m.size() + 1024;
-			vector<uint8_t> result(fin_l);
+			d8u::sse_vector result(fin_l);
 
 			int res = LzmaCompress(result.data(), &fin_l, m.data(), m.size(), props.data(), &prop, level, 4, -1, -1, -1, -1, 1);
 
@@ -144,12 +219,12 @@ namespace d8u
 			}
 		}
 
-		template < typename T > vector<uint8_t> lzma_compress2(const T& m, int level = 5)
+		template < typename T > d8u::sse_vector lzma_compress2(const T& m, int level = 5)
 		{
 			std::array<uint8_t, LZMA_PROPS_SIZE> props;
 			size_t prop = LZMA_PROPS_SIZE;
 			size_t fin_l = m.size() + 1024;
-			vector<uint8_t> result(fin_l);
+			d8u::sse_vector result(fin_l);
 
 			int res = LzmaCompress(result.data(), &fin_l, (const unsigned char*)m.data(), m.size(), props.data(), &prop, level, 4, -1, -1, -1, -1, 1);
 
@@ -169,7 +244,7 @@ namespace d8u
 			return result;
 		}
 
-		void lzma_decompress(vector<uint8_t> & m)
+		void lzma_decompress(d8u::sse_vector& m)
 		{
 			std::array<uint8_t, LZMA_PROPS_SIZE> props = { 93,0,16,0,0 };
 
@@ -181,18 +256,18 @@ namespace d8u
 				return;
 			}
 
-			vector<uint8_t> result(fin_l);
+			d8u::sse_vector result(fin_l);
 			size_t dest = (size_t)fin_l;
 			size_t src = m.size() - sizeof(uint32_t);
 			SRes res = LzmaUncompress( result.data(), &dest, m.data(), &src, props.data(), LZMA_PROPS_SIZE);
 
 			if (res != SZ_OK)
-				throw std::runtime_error("Decryption Error");
+				throw std::runtime_error("LZMA Decompression Error");
 			
 			m = std::move(result);
 		}
 
-		void compress(vector<uint8_t>& m, int _level = 5)
+		void compress(d8u::sse_vector& m, int _level = 5)
 		{
 			auto algorithm = _level / 10;
 			auto level = _level % 10;
@@ -204,10 +279,12 @@ namespace d8u
 				return lzma_compress(m, level);
 			case 1:
 				return gzip_compress(m, level);
+			case 2:
+				return minilzo_compress(m, level);
 			}
 		}
 
-		void decompress(vector<uint8_t>& m)
+		void decompress(d8u::sse_vector& m)
 		{
 			uint32_t fin_l = *(uint32_t*)(m.data() + m.size() - sizeof(uint32_t));
 
@@ -220,30 +297,45 @@ namespace d8u
 				return lzma_decompress(m);
 			case 1:
 				return gzip_decompress(m);
+			case 2:
+				return minilzo_decompress(m);
 			}
 		}
 
-		template <typename D, typename T> std::pair<DefaultHash, DefaultHash> identify(const D& domain, const T& buffer)
+		template <typename T, typename B> T& id_block(const B& buffer)
 		{
-			HashState state;
+			auto phash = (T*)(buffer.end() - sizeof(T) * 2);
+			return *phash;
+		}
+
+		template <typename T, typename B> bool validate_block(const B& buffer)
+		{
+			auto data = span<uint8_t>((uint8_t*)buffer.data(), buffer.size() - sizeof(T) * 2);
+			T check(data);
+
+			return std::equal(check.begin(), check.end(), buffer.end() - sizeof(T));
+		}
+
+		template <typename T , typename D, typename B> std::pair<T, T> identify(const D& domain, const B& buffer)
+		{
+			typename T::State state;
 			state.Update(domain);
 			state.Update(buffer);
 
-			auto key = state.Finish();
-			auto id = key;
-			id.Iterate();
+			alignas(16) T key = state.FinishT<T>();
+			T id = key.GetNext();
 
 			return std::make_pair(key, id);
 		}
 
-		template <typename IN_OUT> DefaultHash encode2(IN_OUT& buffer,const DefaultHash & key, const DefaultHash & id, int level = 5)
+		template <typename T , typename IN_OUT> T encode2(IN_OUT& buffer,const T & key, const T & id, int level = 5)
 		{
 			compress(buffer,level);
 
 			Password pw(key);
 			encrypt(buffer, pw);
 
-			DefaultHash check(buffer);
+			T check(buffer);
 
 			buffer.insert(buffer.end(), id.begin(), id.end());
 			buffer.insert(buffer.end(), check.begin(), check.end());
@@ -267,33 +359,33 @@ namespace d8u
 			return std::make_pair(key,buffer);
 		}*/
 
-		template <typename D, typename IN_OUT> DefaultHash encode(const D& domain, IN_OUT& buffer, int level = 5)
+		template <typename T , typename D, typename IN_OUT> T encode(const D& domain, IN_OUT& buffer, int level = 5)
 		{
-			DefaultHash key, id;
+			T key, id;
 
-			std::tie(key, id) = identify(domain, buffer);
+			std::tie(key, id) = identify<T>(domain, buffer);
 
-			return encode2(buffer, key, id, level);
+			return encode2<T>(buffer, key, id, level);
 		}
 
-		template <typename IN_OUT> void quick_decode(IN_OUT& buffer, const DefaultHash & key)
+		template <typename T , typename IN_OUT> void quick_decode(IN_OUT& buffer, const T & key)
 		{
-			buffer.resize( buffer.size() - sizeof(DefaultHash) * 2);
+			buffer.resize( buffer.size() - sizeof(T) * 2);
 
 			Password pw(key);
 			decrypt(buffer, pw);
 			decompress(buffer);
 		}
 
-		template <typename D, typename IN_OUT> void decode(const D& domain, IN_OUT& buffer, const DefaultHash& key)
+		template <typename T , typename D, typename IN_OUT> void decode(const D& domain, IN_OUT& buffer, const T& key)
 		{
-			buffer.resize(buffer.size() - sizeof(DefaultHash) * 2);
+			buffer.resize(buffer.size() - sizeof(T) * 2);
 
 			Password pw(key);
 			decrypt(buffer, pw);
 			decompress(buffer);
 
-			HashState state;
+			typename T::State state;
 			state.Update(domain);
 			state.Update(buffer);
 
@@ -303,25 +395,11 @@ namespace d8u
 				throw std::runtime_error("Decode Error");
 		}
 
-		template <typename T> DefaultHash& id_block(const T& buffer)
-		{
-			auto phash = (DefaultHash*) (buffer.end() - sizeof(DefaultHash)*2);
-			return *phash;
-		}
-
-		template <typename T> bool validate_block(const T & buffer)
-		{
-			auto data = span<const uint8_t>(buffer.data(), buffer.size() - sizeof(DefaultHash) * 2);
-			DefaultHash check(data);
-
-			return std::equal(check.begin(), check.end(), buffer.end() - sizeof(DefaultHash));
-		}
-
-		class Audit
+		template <typename T > class Audit
 		{
 		public:
 
-			void IO(uint32_t cluster, const d8u::transform::DefaultHash& block)
+			void IO(uint32_t cluster, const T & block)
 			{
 				for (size_t i = 0; i < sum.size(); i++)
 					sum[(i + cluster) % sum.size()] ^= block[i];

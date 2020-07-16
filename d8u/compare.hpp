@@ -12,10 +12,10 @@ namespace d8u
 		using namespace util;
 		using namespace transform;
 
-		DefaultHash hash_file(std::string_view name)
+		template < typename T = _DefaultHash> T hash_file(std::string_view name)
 		{
 			auto file = mio::mmap_source(name);
-			DefaultHash result(file);
+			T result(file);
 			return result;
 		}
 
