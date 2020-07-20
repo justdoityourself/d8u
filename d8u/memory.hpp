@@ -219,6 +219,7 @@ namespace d8u
 
 
 	using sse_vector = std::vector<uint8_t,allocators::AlignedAllocator<uint8_t, d8u::allocators::Alignment::SSE> >;
+	using aligned_vector = sse_vector;
 
 	using namespace std;
 

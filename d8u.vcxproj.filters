@@ -290,6 +290,9 @@
     <ClInclude Include="..\common\zopfli\zopfli\zopfli.h">
       <Filter>Source Files\zopfli</Filter>
     </ClInclude>
+    <ClInclude Include="d8u\crypto.hpp">
+      <Filter>d8u</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />
