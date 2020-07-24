@@ -293,6 +293,9 @@
     <ClInclude Include="d8u\crypto.hpp">
       <Filter>d8u</Filter>
     </ClInclude>
+    <ClInclude Include="d8u\async.hpp">
+      <Filter>d8u</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />

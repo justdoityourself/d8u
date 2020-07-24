@@ -166,6 +166,41 @@ namespace d8u
 #endif
 		}
 
+		std::time_t GetFileWriteTime2(const std::string & filename)
+		{
+#if defined ( _WIN32 )
+			{
+				struct _stat64 fileInfo;
+				try
+				{
+					auto result = _stati64(filename.c_str(), &fileInfo);
+					if (result != 0)
+					{
+						throw "unicode exception or file not found";
+					}
+				}
+				catch (...)
+				{
+					auto result = _wstati64((std::wstring(L"\\\\?\\") + to_wide(filename)).c_str(), &fileInfo);
+					if (result != 0)
+					{
+						std::cout << "Failed to get last write time for file " << filename << " with errno " << result << std::endl;
+						return 0;
+						//throw std::runtime_error("Failed to get last write time.");
+					}
+				}
+
+
+				return fileInfo.st_mtime;
+			}
+#else
+			{
+				auto fsTime = std::filesystem::last_write_time(filename);
+				return decltype (fsTime)::clock::to_time_t(fsTime);
+			}
+#endif
+		}
+
 		template <typename T> T& singleton()
 		{
 			static T t;
