@@ -268,6 +268,7 @@ namespace d8u
 			switch (algorithm)
 			{
 			default:
+				throw std::runtime_error("Invalid block");
 			case 0:
 				return lzma_decompress(m);
 			case 1:
@@ -285,6 +286,9 @@ namespace d8u
 
 		template <typename T, typename B> bool validate_block(const B& buffer)
 		{
+			if (buffer.size() < sizeof(T) * 2)
+				return false;
+
 			auto data = span<uint8_t>((uint8_t*)buffer.data(), buffer.size() - sizeof(T) * 2);
 			T check(data);
 
