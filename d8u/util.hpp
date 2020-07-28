@@ -35,6 +35,17 @@ namespace d8u
 {
 	#define self_t (*this)
 
+	template < typename T > class PlainOldData : public T
+	{
+	public:
+
+		const uint8_t* data() const { return (uint8_t*)this; }
+		size_t size() const { return sizeof(PlainOldData<T>); }
+
+		const uint8_t* begin() const { return data(); }
+		const uint8_t* end() const { return data() + size(); }
+	};
+
 	namespace util
 	{
 		void ClearScreen()
