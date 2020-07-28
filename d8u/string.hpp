@@ -26,6 +26,18 @@ namespace d8u
 			return s;
 		}
 
+		template <typename T> std::string to_hex_t(const T& _d)
+		{
+			std::string s(sizeof(T) * 2, ' ');
+			auto d = (uint8_t*)&_d;
+			for (size_t i = 0; i < sizeof(T); ++i)
+			{
+				s[2 * i] = hexmap[(d[i] & 0xF0) >> 4];
+				s[2 * i + 1] = hexmap[d[i] & 0x0F];
+			}
+			return s;
+		}
+
 		std::vector<uint8_t> to_bin(std::string_view v)
 		{
 			std::vector<uint8_t> result; result.reserve(v.size() / 2 + 1);

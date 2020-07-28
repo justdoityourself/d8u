@@ -215,6 +215,18 @@ namespace d8u
 				return result;
 			}
 
+			Helper GetN(size_t n)
+			{
+				if (n > size())
+					return Helper();
+
+				Helper result = Helper(data(), n);
+
+				Seek(n);
+
+				return result;
+			}
+
 			Helper Trim(std::string_view chars)
 			{
 				size_t i;
