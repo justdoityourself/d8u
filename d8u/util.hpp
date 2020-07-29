@@ -328,6 +328,26 @@ namespace d8u
 				}
 			}
 
+			std::string String()
+			{
+				std::stringstream ss;
+
+				if (direct.blocks)
+					ss << "BLK " << direct.blocks << " ";
+				if (direct.queries)
+					ss << "Q " << direct.queries << " ";
+				if (direct.items)
+					ss << "FT " << direct.items << " ";
+				if (direct.read)
+					ss << "RIO " << direct.read / (1024 * 1024) << "MB ";
+				if (direct.write)
+					ss << "WIO " << direct.write / (1024 * 1024) << "MB ";
+				if (direct.duplicate)
+					ss << "DIO " << direct.duplicate / (1024 * 1024) << "MB ";
+
+				return ss.str();
+			}
+
 			static_assert(sizeof(uint64_t) == sizeof(std::atomic<uint64_t>));
 
 			union

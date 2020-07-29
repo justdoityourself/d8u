@@ -370,6 +370,7 @@
     <ClInclude Include="d8u\string.hpp" />
     <ClInclude Include="d8u\string_switch.hpp" />
     <ClInclude Include="d8u\test.hpp" />
+    <ClInclude Include="d8u\time.hpp" />
     <ClInclude Include="d8u\transform.hpp" />
     <ClInclude Include="d8u\tsm.hpp" />
     <ClInclude Include="d8u\util.hpp" />
