@@ -391,6 +391,11 @@ namespace d8u
 				return { (char*)data(),size() };
 			}
 
+			explicit operator bool() 
+			{ 
+				return size() != 0; 
+			}
+
 			operator int() const
 			{
 				int result = 0;
@@ -399,6 +404,11 @@ namespace d8u
 				std::from_chars(v.data(), v.data() + v.size(), result);
 
 				return result;
+			}
+
+			uint8_t &operator[](size_t dx)
+			{
+				return buffer.data()[dx];
 			}
 
 			template < typename Y > Y* pt(size_t index = 0, size_t g_index = 0) const
