@@ -299,6 +299,9 @@
     <ClInclude Include="d8u\time.hpp">
       <Filter>d8u</Filter>
     </ClInclude>
+    <ClInclude Include="d8u\alt_crypto.hpp">
+      <Filter>d8u</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />

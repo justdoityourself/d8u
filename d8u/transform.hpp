@@ -171,6 +171,34 @@ namespace d8u
 				m = std::move(result);
 			}
 		}
+
+		template < typename T > auto minilzo_compress2(const T & m, int level = 5)
+		{
+			static MiniLZO Context;
+
+			std::array<uint8_t, LZO1X_1_MEM_COMPRESS> workspace;
+
+			d8u::sse_vector result(m.size() + 1024 * 65);
+
+			lzo_uint output_length = (lzo_uint)m.size() + 1024;
+			if (LZO_E_OK != lzo1x_1_compress((uint8_t*)m.data(), (lzo_uint)m.size(), result.data(), &output_length, workspace.data()))
+				output_length = result.size();
+
+			uint32_t l = (uint32_t)m.size() | 0x02000000;
+
+			if (output_length >= m.size())
+			{
+				result = m;
+				result.insert(result.end(), (uint8_t*)&l, ((uint8_t*)&l) + sizeof(uint32_t));
+			}
+			else
+			{
+				result.resize(output_length);
+				result.insert(result.end(), (uint8_t*)&l, ((uint8_t*)&l) + sizeof(uint32_t));
+			}
+
+			return result;
+		}
 		
 		void lzma_compress(d8u::sse_vector & m, int level = 5)
 		{
