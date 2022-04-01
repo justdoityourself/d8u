@@ -6,6 +6,7 @@
 #include <stdexcept>
 #include <string_view>
 #include <charconv>
+#include <vector>
 
 namespace d8u
 {
@@ -25,7 +26,11 @@ namespace d8u
 				if (size == 0)
 					return nullptr;
 
+#ifdef _WIN32
 				void* ptr = _aligned_malloc(size, align);
+#else
+				void* ptr = aligned_alloc(size, align);
+#endif
 
 				return ptr;
 			}
@@ -33,7 +38,12 @@ namespace d8u
 
 			void deallocate_aligned_memory(void* ptr) noexcept
 			{
+#ifdef _WIN32
 				return _aligned_free(ptr);
+#else
+				return free(ptr);
+#endif
+				
 			}
 		}
 
@@ -330,6 +340,27 @@ namespace d8u
 			return result;
 		}
 
+		operator int64_t()
+		{
+			int64_t result = 0;
+
+			auto v = string_view((const char*)data(), size());
+			std::from_chars(v.data(), v.data() + v.size(), result);
+
+			return result;
+		}
+
+		operator double()
+		{
+			return std::stod((const char*)data());
+			/*double result = 0;
+
+			auto v = string_view((const char*)data(), size());
+			std::from_chars(v.data(), v.data() + v.size(), result);
+
+			return result;*/
+		}
+
 		operator string() { return string((const char*)data(), size()); }
 
 		operator vector<uint8_t>()
@@ -344,6 +375,23 @@ namespace d8u
 				l = length - i;
 
 			return Memory(buffer + i, l);
+		}
+
+		void TryQuoteWrapper()
+		{
+			if (*(buffer - 1) == '\"' && *(buffer + length) == '\"')
+			{
+				buffer--;
+				length += 2;
+			}
+		}
+
+		bool operator==(const Memory& m)
+		{
+			if (length != m.length)
+				return false;
+
+			return std::memcmp(buffer, m.buffer, length) == 0;
 		}
 
 	private:

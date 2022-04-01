@@ -3,6 +3,7 @@
 #pragma once
 
 #include "cryptopp/sha.h"
+
 #include "../gsl-lite.hpp"
 
 namespace d8u
@@ -200,7 +201,7 @@ namespace d8u
 
 #pragma pack ( push, 1 )
 
-		template < typename T > class DefaultHashT alignas(16): public array<uint8_t, T::byte_size>
+		template < typename T > class DefaultHashT : public array<uint8_t, T::byte_size>
 		{
 		public:
 			using State = T;
@@ -254,7 +255,7 @@ namespace d8u
 				T state;
 				state.Update(domain);
 				state.Update(data);
-				*this = state.FinishT< DefaultHashT>();
+				*this = state.template FinishT< DefaultHashT>();
 			}
 
 			template <typename B> void Hash(const B& data)

@@ -22,6 +22,9 @@
     <Filter Include="Source Files\zopfli">
       <UniqueIdentifier>{63bb105a-d553-4b91-a9c0-252622cffff1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\minilzo">
+      <UniqueIdentifier>{ae7f1f10-fda3-4b23-a26e-7ddda416d42f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="d8u.cpp">
@@ -201,6 +204,12 @@
     <ClCompile Include="..\common\zopfli\zopfli\zopfli_lib.c">
       <Filter>Source Files\zopfli</Filter>
     </ClCompile>
+    <ClCompile Include="..\common\minilzo-2.10\minilzo\minilzo.c">
+      <Filter>Source Files\minilzo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\minilzo-2.10\minilzo\testmini.c">
+      <Filter>Source Files\minilzo</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="d8u\json.hpp">
@@ -302,8 +311,29 @@
     <ClInclude Include="d8u\alt_crypto.hpp">
       <Filter>d8u</Filter>
     </ClInclude>
+    <ClInclude Include="appi.hpp">
+      <Filter>d8u</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\minilzo-2.10\minilzo\lzoconf.h">
+      <Filter>Source Files\minilzo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\minilzo-2.10\minilzo\lzodefs.h">
+      <Filter>Source Files\minilzo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\minilzo-2.10\minilzo\minilzo.h">
+      <Filter>Source Files\minilzo</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />
+    <None Include="..\common\minilzo-2.10\minilzo\COPYING">
+      <Filter>Source Files\minilzo</Filter>
+    </None>
+    <None Include="..\common\minilzo-2.10\minilzo\Makefile">
+      <Filter>Source Files\minilzo</Filter>
+    </None>
+    <None Include="..\common\minilzo-2.10\minilzo\README.LZO">
+      <Filter>Source Files\minilzo</Filter>
+    </None>
   </ItemGroup>
 </Project>

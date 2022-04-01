@@ -12,7 +12,9 @@
 #include "util.hpp"
 #include "tsm.hpp"
 
+#ifndef D8ULEAN
 #include "../mio.hpp"
+#endif
 
 namespace d8u
 {
@@ -223,6 +225,7 @@ namespace d8u
 					length(length_) {}
 
 				Memory String(void* base) { return Memory(((uint8_t*)base) + offset, length); }
+				std::string_view StringView(void* base) { return std::string_view(((const char*)base) + offset, length); }
 
 				T type;
 				T count;
@@ -237,7 +240,7 @@ namespace d8u
 		template < typename T> class JsonIndexBackend : public JsonIndexDef<T>
 		{
 		public:
-			using JsonIndexDef<T>::_Index;
+			using typename JsonIndexDef<T>::_Index;
 			struct Header
 			{
 				Header() {}
@@ -326,10 +329,10 @@ namespace d8u
 			~JsonIndexStream() = delete;
 		public:
 
-			using JsonIndexBackend<T>::Array;
-			using JsonIndexBackend<T>::Object;
-			using JsonIndexBackend<T>::Header;
-			using JsonIndexDef<T>::_Index;
+			using typename JsonIndexBackend<T>::Array;
+			using typename JsonIndexBackend<T>::Object;
+			using typename JsonIndexBackend<T>::Header;
+			using typename JsonIndexDef<T>::_Index;
 
 			static const size_t index_size_t = sizeof(typename JsonIndexStream<T, I, O> ::_Index);
 
@@ -368,7 +371,7 @@ namespace d8u
 				typename JsonIndexBackend<T>::Array* Find(size_t index) { if (index >= size()) return nullptr; return Root() + index; }
 
 				typename JsonIndexBackend<T>::Array* begin() { return Root(); }
-				typename JsonIndexBackend<T>::Array* end() { return Root + size(); }
+				typename JsonIndexBackend<T>::Array* end() { return Root() + size(); }
 
 			private:
 				typename JsonIndexBackend<T>::Array* Root() { return ((typename JsonIndexBackend<T>::Array*)this) - count; }
@@ -605,6 +608,21 @@ namespace d8u
 				return JsonIndexBase();
 			}
 
+			JsonIndexBase operator()(const Memory& e, bool & isValue) const
+			{
+				isValue = false;
+
+				if (!Valid())return JsonIndexBase();
+
+				typename T::Object* o = Object().Find(e, _json.data());
+				if (!o)return JsonIndexBase();
+
+				isValue = !o->IsNode();
+				if (!isValue) return JsonIndexBase(_json, index, &o->Node(index), allocator);
+
+				return JsonIndexBase();
+			}
+
 			JsonIndexBase operator()(uint32_t i) const
 			{
 				if (!Valid())return JsonIndexBase();
@@ -644,7 +662,7 @@ namespace d8u
 				if (o->IsNode())
 					return o->Node(index).String(_json.data());
 				else
-					return o->Value(_json.data(), index);
+					return o->Value(_json.data());
 			}
 
 			template < typename ... M > Memory Find(const Memory& e, M ... m) const
@@ -701,7 +719,7 @@ namespace d8u
 				return i < root->count;
 			}
 
-			template < typename F> void ForEach(F f) const
+			template < typename F > void ForEach(F f) const
 			{
 				if (!Valid()) return;
 
@@ -733,6 +751,42 @@ namespace d8u
 							f(Memory(""), e->Value(_json.data(), index), i, JsonIndexBase(_json, index, &e->Node(index), allocator));
 						else
 							f(Memory(""), e->Value(_json.data(), index), i, JsonIndexBase());
+					}
+				}
+			}
+
+			template < typename F1, typename F2 > void ForEach(F1 f1, F2 f2) const
+			{
+				if (!Valid()) return;
+
+				if (isObject())
+				{
+					auto& object = Object();
+
+					for (uint32_t i = 0; i < object.size(); i++)
+					{
+						auto* e = object.Find(i);
+						if (!e) break;
+
+						if (e->IsNode())
+							f2(e->Key(_json.data()), JsonIndexBase(_json, index, &e->Node(index), allocator), i);
+						else
+							f1(e->Key(_json.data()), e->Value(_json.data()), i);
+					}
+				}
+				else
+				{
+					auto& arr = Array();
+
+					for (uint32_t i = 0; i < arr.size(); i++)
+					{
+						auto* e = arr.Find(i);
+						if (!e) break;
+
+						if (e->IsNode())
+							f2(Memory(""), JsonIndexBase(_json, index, &e->Node(index), allocator), i);
+						else
+							f1(Memory(""), e->Value(_json.data()), i);
 					}
 				}
 			}
@@ -813,9 +867,378 @@ namespace d8u
 
 			bool Valid() const { return _json.size() > 0; }
 
-			Memory Json() const { if (!Valid()) return Memory(); return root->String(_json.data()); }
+			std::string_view Json() const { if (!Valid()) return std::string_view(); return root->StringView(_json.data()); }
+
+
+
+			template< typename R > std::string Merge(const R& right)
+			{
+				std::string result;
+				result.reserve(size() + right.size());
+
+				_Merge(right, result);
+
+				return result;
+			}
+
+			/*template< typename R, typename T > std::string Pool(const R& right, const T& base, std::vector<T>& pool)
+			{
+				std::string result;
+				result.reserve(size() + right.size());
+
+				_Pool(right, result, base, pool);
+
+				return result;
+			}
+
+			template< typename R, typename T > std::string Depool(const R& right, const T& base, std::vector<T>& pool)
+			{
+				std::string result;
+				result.reserve(size() + right.size());
+
+				_Depool(right, result, base, pool);
+
+				return result;
+			}*/
+
+			template< typename R > std::string Demerge(const R& right)
+			{
+				std::string result;
+				result.reserve(size() + right.size());
+
+				_Demerge(right, result);
+
+				return result;
+			}
+
+			template< typename R > std::string Mask(const R& right)
+			{
+				std::string result;
+				result.reserve(size() + right.size());
+
+				_Mask(right, result);
+
+				return result;
+			}
+
+			template< typename R > auto Compare(const R& right)
+			{
+				auto result = std::make_pair(unsigned(0), unsigned(0));
+
+				_Compare(right, result);
+
+				return result;
+			}
+
+			template< typename R > std::string Accumulate(const R& right)
+			{
+				std::string result;
+				result.reserve(size() + right.size());
+
+				_Accumulate(right, result);
+
+				return result;
+			}
 
 		protected:
+
+			template< typename R > void _Merge(const R& right, std::string& result)
+			{
+				result += (isObject()) ? "{" : "[";
+
+				unsigned values = 0;
+
+				auto add_key = [&](auto key) { if (values++) result += ","; result += "\""; result += key; result += "\":"; };
+				auto add_value = [&](auto value) { value.TryQuoteWrapper();  result += value; };
+
+				ForEach([&](auto key, auto value, auto index) {
+					add_key(key);
+					auto rvalue = right.Find(key);
+					add_value((rvalue.size()) ? rvalue : value);
+				}, [&](auto key, auto object, auto index) {
+					add_key(key);
+
+					auto robject = right(key);
+
+					if (robject.Valid())
+						object._Merge(robject, result);
+					else
+						result += object.Json();
+				});
+
+				right.ForEach([&](auto key, auto value, auto index) {
+					auto lvalue = Find(key);
+
+					if (!lvalue.size())
+					{
+						add_key(key);
+						add_value(value);
+					}
+				}, [&](auto key, auto object, auto index) {
+					auto lobject = (*this)(key);
+
+					if (!lobject.Valid())
+					{
+						add_key(key);
+						result += object.Json();
+					}
+				});
+
+				result += (isObject()) ? "}" : "]";
+			}
+
+			/*template< typename R, typename T > void _Pool(const R& right, std::string& result, const T& base, std::vector<T>& pool)
+			{
+				result += (isObject()) ? "{" : "[";
+
+				unsigned values = 0;
+
+				auto add_key = [&](auto key) { if (values++) result += ","; result += "\""; result += key; result += "\":"; };
+				auto add_value = [&](auto value) { value.TryQuoteWrapper();  result += value; };
+
+				while (pool.size() < ElementCount())
+					pool.push_back(base);
+
+				ForEach([&](auto key, auto value, auto index) {
+					add_key(key);
+					auto rvalue = right.Find(key);
+
+					if (rvalue.size()) pool[index] = base;
+					
+					add_value((rvalue.size()) ? rvalue : value);
+					}, [&](auto key, auto object, auto index) {
+						add_key(key);
+
+						auto robject = right(key);
+
+						if (robject.Valid()) {
+							pool[index] = base;
+							object._Merge(robject, result);
+						}
+						else
+							result += object.Json();
+					});
+
+				right.ForEach([&](auto key, auto value, auto index) {
+					auto lvalue = Find(key);
+
+					if (!lvalue.size())
+					{
+						pool.push_back(base);
+						add_key(key);
+						add_value(value);
+					}
+					}, [&](auto key, auto object, auto index) {
+						auto lobject = (*this)(key);
+
+						if (!lobject.Valid())
+						{
+							pool.push_back(base);
+							add_key(key);
+							result += object.Json();
+						}
+					});
+
+				result += (isObject()) ? "}" : "]";
+			}*/
+
+			template< typename R > void _Demerge(const R& right, std::string& result)
+			{
+				result += (isObject()) ? "{" : "[";
+
+				unsigned values = 0;
+
+				auto add_key = [&](auto key) { if (values++) result += ","; result += "\""; result += key; result += "\":"; };
+				auto add_value = [&](auto value) { value.TryQuoteWrapper();  result += value; };
+
+				ForEach([&](auto key, auto value, auto index) {
+					
+					if (!right.Find(key).size())
+					{
+						add_key(key);
+						add_value(value);
+					}
+					
+				}, [&](auto key, auto object, auto index) {
+					auto robject = right(key);
+
+					if (robject.Valid() && robject.isObject())
+					{
+						add_key(key);
+						object._Demerge(robject, result);
+					}
+					else if(!robject.Valid())
+					{
+						add_key(key);
+						result += object.Json();
+					}				
+				});
+
+				result += (isObject()) ? "}" : "]";
+			}
+
+			/*template< typename R, typename T  > void _Depool(const R& right, std::string& result, const T& base, std::vector<T>& pool)
+			{
+				result += (isObject()) ? "{" : "[";
+
+				unsigned values = 0;
+
+				auto add_key = [&](auto key) { if (values++) result += ","; result += "\""; result += key; result += "\":"; };
+				auto add_value = [&](auto value) { value.TryQuoteWrapper();  result += value; };
+
+				while (pool.size() < ElementCount())
+					pool.push_back(base);
+
+				ForEach([&](auto key, auto value, auto index) {
+
+					if (!right.Find(key).size())
+					{
+						add_key(key);
+						add_value(value);
+					}
+					else {
+						pool[index] = base;
+						add_key(key);
+						add_value(Memory(""));
+					}
+
+					}, [&](auto key, auto object, auto index) {
+						auto robject = right(key);
+
+						if (robject.Valid() && robject.isObject())
+						{
+							pool[index] = base;
+							add_key(key);
+							object._Demerge(robject, result);
+						}
+						else if (!robject.Valid())
+						{
+							add_key(key);
+							result += object.Json();
+						}
+					});
+
+				result += (isObject()) ? "}" : "]";
+			}*/
+
+			template< typename R > void _Mask(const R& right, std::string& result)
+			{
+				result += (isObject()) ? "{" : "[";
+
+				unsigned values = 0;
+
+				auto add_key = [&](auto key) { if (values++) result += ","; result += "\""; result += key; result += "\":"; };
+				auto add_value = [&](auto value) { value.TryQuoteWrapper();  result += value; };
+
+				right.ForEach([&](auto key, auto value, auto index) {
+
+					if (Find(key).size())
+					{
+						add_key(key);
+						add_value((*this)[key]);
+					}
+
+					}, [&](auto key, auto robject, auto index) {
+						auto object = (*this)(key);
+
+						if (object.Valid() && object.isObject())
+						{
+							add_key(key);
+							object._Mask(robject, result);
+						}
+						else if (object.Valid())
+						{
+							add_key(key);
+							add_value((*this)[key]);
+						}
+					});
+
+				result += (isObject()) ? "}" : "]";
+			}
+
+			template< typename R > void _Compare(const R& right, std::pair<unsigned,unsigned> & result)
+			{
+				ForEach([&](auto key, auto value, auto index) 
+				{
+					auto rvalue = right.Find(key);
+					if (rvalue.size() && std::string_view(rvalue) == std::string_view(value))
+						result.first++;
+					else
+						result.second++;
+				}, [&](auto key, auto object, auto index) {
+					auto robject = right(key);
+
+					if (robject.Valid())
+						object._Compare(robject, result);
+					else
+						result.second++;
+				});
+
+				right.ForEach([&](auto key, auto value, auto index) 
+				{
+					auto lvalue = Find(key);
+
+					if (!lvalue.size())
+						result.second++;
+				}, [&](auto key, auto object, auto index) {
+					auto lobject = (*this)(key);
+
+					if (!lobject.Valid())
+						result.second++;
+				});
+			}
+
+			template< typename R > void _Accumulate(const R& right, std::string & result)
+			{
+				result += (isObject()) ? "{" : "[";
+
+				unsigned values = 0;
+
+				auto add_key = [&](auto key) { if (values++) result += ","; result += "\""; result += std::string_view(key); result += "\":"; };
+				auto add_value = [&](auto value) { value.TryQuoteWrapper();  result += std::string_view(value); };
+
+				ForEach([&](auto key, auto value, auto index) {
+					add_key(key);
+					auto rvalue = right.Find(key);
+					if (rvalue.size())
+					{
+						int64_t r = rvalue, l = value;
+						result += std::to_string(l + r);
+					}
+					else
+						add_value(value);
+					}, [&](auto key, auto object, auto index) {
+						add_key(key);
+
+						auto robject = right(key);
+
+						if (robject.Valid())
+							object._Accumulate(robject, result);
+						else
+							result += object.Json();
+					});
+
+				right.ForEach([&](auto key, auto value, auto index) {
+					auto lvalue = Find(key);
+
+					if (!lvalue.size())
+					{
+						add_key(key);
+						add_value(value);
+					}
+					}, [&](auto key, auto object, auto index) {
+						auto lobject = (*this)(key);
+
+						if (!lobject.Valid())
+						{
+							add_key(key);
+							result += object.Json();
+						}
+					});
+
+				result += (isObject()) ? "}" : "]";
+			}
+
 			typename T::ObjectIndex& Object() const
 			{
 				return *((typename T::ObjectIndex*)root);
@@ -881,6 +1304,12 @@ namespace d8u
 		typedef JsonIndexT<IndexStream, JsonObjectMax> JsonReaderL;
 		typedef JsonIndexT<IndexStreamH, JsonObjectMax> JsonReaderH;
 
+		template < typename F, typename S > auto JsonCompare(const F& first, const S& second)
+		{
+			return JsonReader(first).Compare(JsonReader(second));
+		}
+
+#ifndef D8ULEAN
 		template <typename T> class JsonMapT : public T
 		{
 		public:
@@ -914,5 +1343,6 @@ namespace d8u
 		typedef JsonMapT<JsonReaderS> JsonMapS;
 		typedef JsonMapT<JsonReader> JsonMap;
 		typedef JsonMapT<JsonReaderL> JsonMapL;
+#endif
 	}
 }

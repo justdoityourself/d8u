@@ -45,52 +45,52 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Test|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Benchmark|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Test|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Benchmark|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -327,6 +327,8 @@
     <ClCompile Include="..\common\LZMA19.00\LZMA\XzDec.c" />
     <ClCompile Include="..\common\LZMA19.00\LZMA\XzEnc.c" />
     <ClCompile Include="..\common\LZMA19.00\LZMA\XzIn.c" />
+    <ClCompile Include="..\common\minilzo-2.10\minilzo\minilzo.c" />
+    <ClCompile Include="..\common\minilzo-2.10\minilzo\testmini.c" />
     <ClCompile Include="..\common\zopfli\zopfli\blocksplitter.c" />
     <ClCompile Include="..\common\zopfli\zopfli\cache.c" />
     <ClCompile Include="..\common\zopfli\zopfli\deflate.c" />
@@ -344,6 +346,9 @@
     <ClCompile Include="d8u\compare.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\common\minilzo-2.10\minilzo\lzoconf.h" />
+    <ClInclude Include="..\common\minilzo-2.10\minilzo\lzodefs.h" />
+    <ClInclude Include="..\common\minilzo-2.10\minilzo\minilzo.h" />
     <ClInclude Include="..\common\zopfli\zopfli\blocksplitter.h" />
     <ClInclude Include="..\common\zopfli\zopfli\cache.h" />
     <ClInclude Include="..\common\zopfli\zopfli\deflate.h" />
@@ -357,6 +362,7 @@
     <ClInclude Include="..\common\zopfli\zopfli\util.h" />
     <ClInclude Include="..\common\zopfli\zopfli\zlib_container.h" />
     <ClInclude Include="..\common\zopfli\zopfli\zopfli.h" />
+    <ClInclude Include="appi.hpp" />
     <ClInclude Include="catch.hpp" />
     <ClInclude Include="d8u\alt_crypto.hpp" />
     <ClInclude Include="d8u\async.hpp" />
@@ -379,6 +385,9 @@
     <ClInclude Include="gsl-lite.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\common\minilzo-2.10\minilzo\COPYING" />
+    <None Include="..\common\minilzo-2.10\minilzo\Makefile" />
+    <None Include="..\common\minilzo-2.10\minilzo\README.LZO" />
     <None Include=".gitignore" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

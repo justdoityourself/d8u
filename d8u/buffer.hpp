@@ -5,6 +5,7 @@
 #include <charconv>
 #include <string_view>
 #include <vector>
+#include <string_view>
 
 #include "memory.hpp"
 
@@ -33,10 +34,15 @@ namespace d8u
 		u = swap_endian(u);
 	}
 
-	template < typename C> gsl::span<uint8_t> byte_buffer(C& buffer)
+	template < typename C > gsl::span<uint8_t> byte_buffer(C& buffer)
 	{
 		return gsl::span<uint8_t>((uint8_t*)buffer.data(), buffer.size() * sizeof(C::value_type));
 	}
+
+	/*template < typename C, typename std::enable_if<std::is_same<C, std::string_view>::value, void* >::type = nullptr > gsl::span<uint8_t> byte_buffer(C& buffer)
+	{
+		return gsl::span<uint8_t>((uint8_t*)buffer.data(), buffer.size());
+	}*/
 
 	template < typename T, typename C> gsl::span<T> t_buffer(const C& buffer)
 	{

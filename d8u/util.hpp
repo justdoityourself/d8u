@@ -14,16 +14,20 @@
 
 //Picosha is slow slow slow, but you can uncomment it if you don't have cryptopp set up.
 //#include "../picosha2.hpp"
-#include "cryptopp/sha.h"
+//#include "cryptopp/sha.h"
 
 #include <atomic>
 #include <cstdint>
-#include <filesystem>
 #include <fstream>
 #include <atomic>
 #include <thread>
+#include <iostream>
 
+#ifndef D8ULEAN
+#include <filesystem>
 #include "../mio.hpp"
+#endif
+
 #include "../gsl-lite.hpp"
 
 #ifdef _WIN32
@@ -35,6 +39,17 @@
 namespace d8u
 {
 	#define self_t (*this)
+
+	template <typename ... args_t> constexpr void trace(args_t const& ... args)
+	{
+#ifdef _DEBUG
+
+		((std::cout << args << " "), ...);
+
+		std::cout << std::endl;
+
+#endif
+	}
 
 	template < typename T > class PlainOldData : public T
 	{
@@ -74,7 +89,7 @@ namespace d8u
 			SetConsoleCursorPosition(hOut, topLeft);
 
 #else
-			::systel("cls");
+			::system("cls");
 #endif
 		}
 
@@ -119,12 +134,12 @@ namespace d8u
 
 		void empty_file(const string_view file)
 		{
-			ofstream fs(file, ios::out);
+			ofstream fs(file.data(), ios::out);
 		}
 
 		template <typename T> uint64_t append_file(const string_view file, const T& m)
 		{
-			ofstream fs(file, ios::out | fstream::app | ios::binary);
+			ofstream fs(file.data(), ios::out | fstream::app | ios::binary);
 			uint64_t result = fs.tellp();
 			fs.write((const char*)&m.length, sizeof(uint32_t));
 			fs.write((const char*)m.data(), m.size());
@@ -135,10 +150,11 @@ namespace d8u
 		void empty_file1(const string_view file)
 		{
 			ofstream fout;
-			fout.open(file, ios::out);
+			fout.open(file.data(), ios::out);
 			fout << 'c';
 		}
 
+#ifndef D8ULEAN
 #if defined ( _WIN32 )
 #include <sys/stat.h>
 #endif
@@ -241,6 +257,24 @@ namespace d8u
 			}
 #endif
 		}
+
+		void string_as_file(string_view file, string_view data)
+		{
+			filesystem::remove(file);
+
+			ofstream f(file.data());
+			f << data;
+		}
+
+		typedef array<uint8_t, 32> file_id;
+		void id_file(string_view name, file_id& hash)
+		{
+			mio::mmap_source file(name);
+			//CryptoPP::SHA256().CalculateDigest(hash.data(), (const CryptoPP::byte*) file.data(), file.size());
+			//picosha2::hash256(file.begin(), file.end(), hash.begin(), hash.end());
+		}
+
+#endif
 
 		template <typename T> T& singleton()
 		{
@@ -349,7 +383,7 @@ namespace d8u
 				return ss.str();
 			}
 
-			static_assert(sizeof(uint64_t) == sizeof(std::atomic<uint64_t>));
+			static_assert(sizeof(uint64_t) == sizeof(std::atomic<uint64_t>), "Size Mismatch");
 
 			union
 			{
@@ -396,14 +430,6 @@ namespace d8u
 			time_t t = chrono::system_clock::to_time_t(p);
 
 			return to_string((uint64_t)t);
-		}
-
-		typedef array<uint8_t, 32> file_id;
-		void id_file(string_view name, file_id& hash)
-		{
-			mio::mmap_source file(name);
-			CryptoPP::SHA256().CalculateDigest(hash.data(), (const CryptoPP::byte*) file.data(), file.size());
-			//picosha2::hash256(file.begin(), file.end(), hash.begin(), hash.end());
 		}
 
 		//Original from d88::factor
@@ -461,14 +487,6 @@ namespace d8u
 		constexpr size_t _mb(size_t s) { return s * 1024 * 1024; }
 		constexpr size_t _kb(size_t s) { return s * 1024; }
 		constexpr size_t _gb(size_t s) { return s * 1024 * 1024 * 1024; }
-
-		void string_as_file(string_view file, string_view data)
-		{
-			filesystem::remove(file);
-
-			ofstream f(file);
-			f << data;
-		}
 
 		array<uint8_t, 16> unique_id()
 		{
