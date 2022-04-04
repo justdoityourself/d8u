@@ -860,7 +860,7 @@ namespace d8u
 			explicit operator Memory() { if (!Valid()) return Memory(); return Memory(data(), size()); } const
 
 			uint8_t* data() const { if (!Valid()) return nullptr; return root->String(_json.data()).data(); }
-			uint32_t size() const { if (!Valid()) return 0; return root->String(_json.data()).size(); }
+			uint32_t size() const { if (!Valid()) return 0; return (uint32_t)root->String(_json.data()).size(); }
 
 			bool isObject() const { return root->type == JsonStream::Types::TypeObject; }
 			bool isArray() const { return root->type == JsonStream::Types::TypeArray; }
