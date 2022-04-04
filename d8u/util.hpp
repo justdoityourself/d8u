@@ -217,9 +217,10 @@ namespace d8u
 			}
 #else
 			{
-				const auto fileTime = std::filesystem::last_write_time(filename);
-				const auto systemTime = std::chrono::clock_cast<std::chrono::system_clock>(fileTime);
-				return std::chrono::system_clock::to_time_t(systemTime);
+				return std::time_t(0);
+				//const auto fileTime = std::filesystem::last_write_time(filename);
+				//const auto systemTime = std::chrono::clock_cast<std::chrono::system_clock>(fileTime);
+				//return std::chrono::system_clock::to_time_t(systemTime);
 			}
 #endif
 		}
@@ -253,8 +254,9 @@ namespace d8u
 			}
 #else
 			{
-				auto fsTime = std::filesystem::last_write_time(filename);
-				return decltype (fsTime)::clock::to_time_t(fsTime);
+				return std::time_t(0);
+				//auto fsTime = std::filesystem::last_write_time(filename);
+				//return decltype (fsTime)::clock::to_time_t(fsTime);
 			}
 #endif
 		}
