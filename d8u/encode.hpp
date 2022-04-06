@@ -97,7 +97,8 @@ namespace d8u
 			std::vector<uint8_t> out;
 			out.reserve(in.size() * 3 / 4 + 4);
 
-			std::array<int, 256> T = { -1 };
+			std::array<int, 256> T;
+			T.fill(-1);
 			for (int i = 0; i < 64; i++)
 				T["ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"[i]] = i;
 
@@ -123,7 +124,8 @@ namespace d8u
 			R out;
 			auto itr = (uint8_t*)&out;
 
-			std::array<int, 256> T = { -1 };
+			std::array<int, 256> T;
+			T.fill(-1);
 			for (int i = 0; i < 64; i++)
 				T["ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789._"[i]] = i;
 
@@ -151,7 +153,8 @@ namespace d8u
 			std::vector<uint8_t> out;
 			out.reserve(in.size() * 3 / 4 + 4);
 
-			std::array<int, 256> T = { -1 };
+			std::array<int, 256> T;
+			T.fill(-1);
 			for (int i = 0; i < 64; i++)
 				T["ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789._"[i]] = i;
 

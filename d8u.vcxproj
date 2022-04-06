@@ -383,6 +383,7 @@
     <ClInclude Include="d8u\util.hpp" />
     <ClInclude Include="d8u\win32_misc.h" />
     <ClInclude Include="gsl-lite.hpp" />
+    <ClInclude Include="ltc.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\common\minilzo-2.10\minilzo\COPYING" />

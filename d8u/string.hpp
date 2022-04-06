@@ -12,6 +12,19 @@ namespace d8u
 {
 	namespace util
 	{
+		template < typename F > size_t split(const std::string_view target, std::string_view delimiter, F f)
+		{
+			size_t pre = 0, i = 0;
+
+			for (size_t pos = 0; (pos = target.find(delimiter, pre)) != std::string_view::npos; i++, pre=pos+1)
+				f(target.substr(pre, pos-pre), i);
+
+			if(pre) f(target.substr(pre, target.size()-pre), i);
+
+			return i;
+		}
+
+
 		constexpr char hexmap[] = { '0', '1', '2', '3', '4', '5', '6', '7',
 									'8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
 

@@ -435,6 +435,19 @@ namespace d8u
 			return to_string((uint64_t)t);
 		}
 
+		auto now_s(std::string_view s) 
+		{
+			return std::stol(std::string(s));
+		}
+
+		auto now_n()
+		{
+			chrono::system_clock::time_point p = chrono::system_clock::now();
+			time_t t = chrono::system_clock::to_time_t(p);
+
+			return t;
+		}
+
 		//Original from d88::factor
 		/*template < typename T > void FactorExpand(const span<T>& poly, span<T> output)
 		{

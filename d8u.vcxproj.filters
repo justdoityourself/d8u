@@ -323,6 +323,9 @@
     <ClInclude Include="..\common\minilzo-2.10\minilzo\minilzo.h">
       <Filter>Source Files\minilzo</Filter>
     </ClInclude>
+    <ClInclude Include="ltc.hpp">
+      <Filter>d8u</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />
