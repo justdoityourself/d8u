@@ -92,7 +92,7 @@ namespace d8u
 			return out;
 		}
 
-		std::vector<uint8_t> base64(const std::string_view in)
+		inline std::vector<uint8_t> base64(const std::string_view in)
 		{
 			std::vector<uint8_t> out;
 			out.reserve(in.size() * 3 / 4 + 4);
@@ -148,7 +148,7 @@ namespace d8u
 			return out;
 		}
 
-		std::vector<uint8_t> url(const std::string_view in)
+		inline std::vector<uint8_t> url(const std::string_view in)
 		{
 			std::vector<uint8_t> out;
 			out.reserve(in.size() * 3 / 4 + 4);

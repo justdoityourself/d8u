@@ -7,7 +7,7 @@
 
 #define CATCH_CONFIG_RUNNER
 #include "catch.hpp"
-#include "d8u/test.hpp"
+#include "d8u/test_crypto.hpp"
 
 int main(int argc, char* argv[])
 {

@@ -135,7 +135,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Test|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>../template_crypto;../common/minilzo-2.10;../common/cryptopp8.2;../common/LZMA19.00;../common/zopfli;$(IncludePath)</IncludePath>
+    <IncludePath>..\common\libtomcrypt\src\headers;..\common\libtommath;../template_crypto;../common/minilzo-2.10;../common/cryptopp8.2;../common/LZMA19.00;../common/zopfli;$(IncludePath)</IncludePath>
     <LibraryPath>../common/cryptopp8.2\CryptoPP\x64\Output\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -197,8 +197,8 @@
       <PrecompiledHeader>
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;TEST_RUNNER;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>false</SDLCheck>
+      <PreprocessorDefinitions>LTM_DESC;D8U_LTC;_CRT_SECURE_NO_WARNINGS;TEST_RUNNER;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -283,52 +283,155 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\common\LZMA19.00\LZMA\7zAlloc.c" />
-    <ClCompile Include="..\common\LZMA19.00\LZMA\7zArcIn.c" />
-    <ClCompile Include="..\common\LZMA19.00\LZMA\7zBuf.c" />
-    <ClCompile Include="..\common\LZMA19.00\LZMA\7zBuf2.c" />
-    <ClCompile Include="..\common\LZMA19.00\LZMA\7zCrc.c" />
-    <ClCompile Include="..\common\LZMA19.00\LZMA\7zCrcOpt.c" />
-    <ClCompile Include="..\common\LZMA19.00\LZMA\7zDec.c" />
-    <ClCompile Include="..\common\LZMA19.00\LZMA\7zFile.c" />
-    <ClCompile Include="..\common\LZMA19.00\LZMA\7zStream.c" />
-    <ClCompile Include="..\common\LZMA19.00\LZMA\Aes.c" />
-    <ClCompile Include="..\common\LZMA19.00\LZMA\AesOpt.c" />
-    <ClCompile Include="..\common\LZMA19.00\LZMA\Alloc.c" />
-    <ClCompile Include="..\common\LZMA19.00\LZMA\Bcj2.c" />
-    <ClCompile Include="..\common\LZMA19.00\LZMA\Bcj2Enc.c" />
-    <ClCompile Include="..\common\LZMA19.00\LZMA\Bra.c" />
-    <ClCompile Include="..\common\LZMA19.00\LZMA\Bra86.c" />
-    <ClCompile Include="..\common\LZMA19.00\LZMA\BraIA64.c" />
-    <ClCompile Include="..\common\LZMA19.00\LZMA\CpuArch.c" />
-    <ClCompile Include="..\common\LZMA19.00\LZMA\Delta.c" />
-    <ClCompile Include="..\common\LZMA19.00\LZMA\DllSecur.c" />
-    <ClCompile Include="..\common\LZMA19.00\LZMA\LzFind.c" />
-    <ClCompile Include="..\common\LZMA19.00\LZMA\LzFindMt.c" />
-    <ClCompile Include="..\common\LZMA19.00\LZMA\Lzma2Dec.c" />
-    <ClCompile Include="..\common\LZMA19.00\LZMA\Lzma2DecMt.c" />
-    <ClCompile Include="..\common\LZMA19.00\LZMA\Lzma2Enc.c" />
-    <ClCompile Include="..\common\LZMA19.00\LZMA\Lzma86Dec.c" />
-    <ClCompile Include="..\common\LZMA19.00\LZMA\Lzma86Enc.c" />
-    <ClCompile Include="..\common\LZMA19.00\LZMA\LzmaDec.c" />
-    <ClCompile Include="..\common\LZMA19.00\LZMA\LzmaEnc.c" />
-    <ClCompile Include="..\common\LZMA19.00\LZMA\LzmaLib.c" />
-    <ClCompile Include="..\common\LZMA19.00\LZMA\MtCoder.c" />
-    <ClCompile Include="..\common\LZMA19.00\LZMA\MtDec.c" />
-    <ClCompile Include="..\common\LZMA19.00\LZMA\Ppmd7.c" />
-    <ClCompile Include="..\common\LZMA19.00\LZMA\Ppmd7Dec.c" />
-    <ClCompile Include="..\common\LZMA19.00\LZMA\Ppmd7Enc.c" />
-    <ClCompile Include="..\common\LZMA19.00\LZMA\Sha256.c" />
-    <ClCompile Include="..\common\LZMA19.00\LZMA\Sort.c" />
-    <ClCompile Include="..\common\LZMA19.00\LZMA\Threads.c" />
-    <ClCompile Include="..\common\LZMA19.00\LZMA\Xz.c" />
-    <ClCompile Include="..\common\LZMA19.00\LZMA\XzCrc64.c" />
-    <ClCompile Include="..\common\LZMA19.00\LZMA\XzCrc64Opt.c" />
-    <ClCompile Include="..\common\LZMA19.00\LZMA\XzDec.c" />
-    <ClCompile Include="..\common\LZMA19.00\LZMA\XzEnc.c" />
-    <ClCompile Include="..\common\LZMA19.00\LZMA\XzIn.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\hashes\sha1.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\hashes\sha2\sha256.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\modes\ctr\ctr_decrypt.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\modes\ctr\ctr_done.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\modes\ctr\ctr_encrypt.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\modes\ctr\ctr_getiv.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\modes\ctr\ctr_setiv.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\modes\ctr\ctr_start.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\modes\ctr\ctr_test.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\modes\ofb\ofb_decrypt.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\modes\ofb\ofb_done.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\modes\ofb\ofb_encrypt.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\modes\ofb\ofb_getiv.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\modes\ofb\ofb_setiv.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\modes\ofb\ofb_start.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\prngs\yarrow.c" />
+    <ClCompile Include="..\common\LZMA19.00\LZMA\7zAlloc.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\7zArcIn.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\7zBuf.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\7zBuf2.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\7zCrc.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\7zCrcOpt.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\7zDec.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\7zFile.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\7zStream.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\Aes.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\AesOpt.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\Alloc.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\Bcj2.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\Bcj2Enc.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\Bra.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\Bra86.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\BraIA64.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\CpuArch.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\Delta.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\DllSecur.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\LzFind.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\LzFindMt.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\Lzma2Dec.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\Lzma2DecMt.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\Lzma2Enc.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\Lzma86Dec.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\Lzma86Enc.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\LzmaDec.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\LzmaEnc.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\LzmaLib.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\MtCoder.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\MtDec.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\Ppmd7.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\Ppmd7Dec.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\Ppmd7Enc.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\Sha256xz.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\Sort.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\Threads.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\Xz.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\XzCrc64.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\XzCrc64Opt.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\XzDec.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\XzEnc.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\common\LZMA19.00\LZMA\XzIn.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\common\minilzo-2.10\minilzo\minilzo.c" />
-    <ClCompile Include="..\common\minilzo-2.10\minilzo\testmini.c" />
     <ClCompile Include="..\common\zopfli\zopfli\blocksplitter.c" />
     <ClCompile Include="..\common\zopfli\zopfli\cache.c" />
     <ClCompile Include="..\common\zopfli\zopfli\deflate.c" />
@@ -340,10 +443,291 @@
     <ClCompile Include="..\common\zopfli\zopfli\tree.c" />
     <ClCompile Include="..\common\zopfli\zopfli\util.c" />
     <ClCompile Include="..\common\zopfli\zopfli\zlib_container.c" />
-    <ClCompile Include="..\common\zopfli\zopfli\zopfli_bin.c" />
     <ClCompile Include="..\common\zopfli\zopfli\zopfli_lib.c" />
     <ClCompile Include="d8u.cpp" />
     <ClCompile Include="d8u\compare.hpp" />
+    <ClCompile Include="..\common\libtomcrypt\src\ciphers\aes\aes.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\encauth\gcm\gcm_add_aad.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\encauth\gcm\gcm_add_iv.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\encauth\gcm\gcm_done.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\encauth\gcm\gcm_gf_mult.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\encauth\gcm\gcm_init.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\encauth\gcm\gcm_memory.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\encauth\gcm\gcm_mult_h.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\encauth\gcm\gcm_process.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\hashes\helper\hash_memory.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\hashes\helper\hash_memory_multi.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\hashes\sha2\sha512.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\math\ltm_desc.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\math\multi.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\math\rand_prime.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\misc\compare_testvector.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\misc\copy_or_zeromem.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\misc\crypt\crypt_argchk.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\misc\crypt\crypt_cipher_descriptor.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\misc\crypt\crypt_cipher_is_valid.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\misc\crypt\crypt_find_cipher.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\misc\crypt\crypt_hash_descriptor.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\misc\crypt\crypt_hash_is_valid.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\misc\crypt\crypt_inits.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\misc\crypt\crypt_ltc_mp_descriptor.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\misc\crypt\crypt_prng_descriptor.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\misc\crypt\crypt_prng_is_valid.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\misc\crypt\crypt_register_cipher.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\misc\crypt\crypt_register_hash.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\misc\crypt\crypt_register_prng.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\misc\mem_neq.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\misc\zeromem.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\modes\cbc\cbc_decrypt.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\modes\cbc\cbc_done.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\modes\cbc\cbc_encrypt.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\modes\cbc\cbc_getiv.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\modes\cbc\cbc_setiv.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\modes\cbc\cbc_start.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\der\bit\der_decode_bit_string.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\der\bit\der_decode_raw_bit_string.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\der\bit\der_encode_bit_string.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\der\bit\der_encode_raw_bit_string.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\der\bit\der_length_bit_string.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\der\boolean\der_decode_boolean.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\der\boolean\der_encode_boolean.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\der\boolean\der_length_boolean.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\der\choice\der_decode_choice.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\der\custom_type\der_decode_custom_type.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\der\custom_type\der_encode_custom_type.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\der\custom_type\der_length_custom_type.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\der\generalizedtime\der_decode_generalizedtime.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\der\generalizedtime\der_encode_generalizedtime.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\der\generalizedtime\der_length_generalizedtime.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\der\general\der_asn1_maps.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\der\general\der_decode_asn1_identifier.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\der\general\der_decode_asn1_length.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\der\general\der_encode_asn1_identifier.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\der\general\der_encode_asn1_length.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\der\general\der_length_asn1_identifier.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\der\general\der_length_asn1_length.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\der\ia5\der_decode_ia5_string.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\der\ia5\der_encode_ia5_string.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\der\ia5\der_length_ia5_string.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\der\integer\der_decode_integer.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\der\integer\der_encode_integer.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\der\integer\der_length_integer.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\der\object_identifier\der_decode_object_identifier.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\der\object_identifier\der_encode_object_identifier.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\der\object_identifier\der_length_object_identifier.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\der\octet\der_decode_octet_string.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\der\octet\der_encode_octet_string.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\der\octet\der_length_octet_string.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\der\printable_string\der_decode_printable_string.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\der\printable_string\der_encode_printable_string.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\der\printable_string\der_length_printable_string.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\der\sequence\der_decode_sequence_ex.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\der\sequence\der_decode_sequence_flexi.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\der\sequence\der_decode_sequence_multi.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\der\sequence\der_encode_sequence_ex.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\der\sequence\der_encode_sequence_multi.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\der\sequence\der_length_sequence.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\der\sequence\der_sequence_free.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\der\sequence\der_sequence_shrink.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\der\set\der_encode_set.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\der\set\der_encode_setof.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\der\short_integer\der_decode_short_integer.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\der\short_integer\der_encode_short_integer.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\der\short_integer\der_length_short_integer.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\der\teletex_string\der_decode_teletex_string.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\der\teletex_string\der_length_teletex_string.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\der\utctime\der_decode_utctime.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\der\utctime\der_encode_utctime.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\der\utctime\der_length_utctime.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\der\utf8\der_decode_utf8_string.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\der\utf8\der_encode_utf8_string.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\der\utf8\der_length_utf8_string.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\oid\pk_get_oid.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\oid\pk_oid_cmp.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\oid\pk_oid_str.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\x509\x509_decode_subject_public_key_info.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\asn1\x509\x509_encode_subject_public_key_info.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\ecc\ltc_ecc_is_point_at_infinity.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\ecc\ltc_ecc_map.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\ecc\ltc_ecc_mul2add.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\ecc\ltc_ecc_mulmod.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\ecc\ltc_ecc_mulmod_timing.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\ecc\ltc_ecc_points.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\ecc\ltc_ecc_projective_add_point.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\ecc\ltc_ecc_projective_dbl_point.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\pkcs1\pkcs_1_mgf1.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\pkcs1\pkcs_1_oaep_decode.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\pkcs1\pkcs_1_oaep_encode.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\pkcs1\pkcs_1_pss_decode.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\pkcs1\pkcs_1_pss_encode.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\pkcs1\pkcs_1_v1_5_decode.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\pkcs1\pkcs_1_v1_5_encode.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\rsa\rsa_decrypt_key.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\rsa\rsa_encrypt_key.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\rsa\rsa_export.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\rsa\rsa_exptmod.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\rsa\rsa_import.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\rsa\rsa_key.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\rsa\rsa_make_key.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\rsa\rsa_sign_hash.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\pk\rsa\rsa_verify_hash.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\prngs\rng_get_bytes.c" />
+    <ClCompile Include="..\common\libtomcrypt\src\prngs\sprng.c" />
+    <ClCompile Include="..\common\libtommath\mp_2expt.c" />
+    <ClCompile Include="..\common\libtommath\mp_abs.c" />
+    <ClCompile Include="..\common\libtommath\mp_add.c" />
+    <ClCompile Include="..\common\libtommath\mp_addmod.c" />
+    <ClCompile Include="..\common\libtommath\mp_add_d.c" />
+    <ClCompile Include="..\common\libtommath\mp_and.c" />
+    <ClCompile Include="..\common\libtommath\mp_clamp.c" />
+    <ClCompile Include="..\common\libtommath\mp_clear.c" />
+    <ClCompile Include="..\common\libtommath\mp_clear_multi.c" />
+    <ClCompile Include="..\common\libtommath\mp_cmp.c" />
+    <ClCompile Include="..\common\libtommath\mp_cmp_d.c" />
+    <ClCompile Include="..\common\libtommath\mp_cmp_mag.c" />
+    <ClCompile Include="..\common\libtommath\mp_cnt_lsb.c" />
+    <ClCompile Include="..\common\libtommath\mp_complement.c" />
+    <ClCompile Include="..\common\libtommath\mp_copy.c" />
+    <ClCompile Include="..\common\libtommath\mp_count_bits.c" />
+    <ClCompile Include="..\common\libtommath\mp_cutoffs.c" />
+    <ClCompile Include="..\common\libtommath\mp_div.c" />
+    <ClCompile Include="..\common\libtommath\mp_div_2.c" />
+    <ClCompile Include="..\common\libtommath\mp_div_2d.c" />
+    <ClCompile Include="..\common\libtommath\mp_div_d.c" />
+    <ClCompile Include="..\common\libtommath\mp_dr_is_modulus.c" />
+    <ClCompile Include="..\common\libtommath\mp_dr_reduce.c" />
+    <ClCompile Include="..\common\libtommath\mp_dr_setup.c" />
+    <ClCompile Include="..\common\libtommath\mp_error_to_string.c" />
+    <ClCompile Include="..\common\libtommath\mp_exch.c" />
+    <ClCompile Include="..\common\libtommath\mp_exptmod.c" />
+    <ClCompile Include="..\common\libtommath\mp_expt_n.c" />
+    <ClCompile Include="..\common\libtommath\mp_exteuclid.c" />
+    <ClCompile Include="..\common\libtommath\mp_fread.c" />
+    <ClCompile Include="..\common\libtommath\mp_from_sbin.c" />
+    <ClCompile Include="..\common\libtommath\mp_from_ubin.c" />
+    <ClCompile Include="..\common\libtommath\mp_fwrite.c" />
+    <ClCompile Include="..\common\libtommath\mp_gcd.c" />
+    <ClCompile Include="..\common\libtommath\mp_get_double.c" />
+    <ClCompile Include="..\common\libtommath\mp_get_i32.c" />
+    <ClCompile Include="..\common\libtommath\mp_get_i64.c" />
+    <ClCompile Include="..\common\libtommath\mp_get_l.c" />
+    <ClCompile Include="..\common\libtommath\mp_get_mag_u32.c" />
+    <ClCompile Include="..\common\libtommath\mp_get_mag_u64.c" />
+    <ClCompile Include="..\common\libtommath\mp_get_mag_ul.c" />
+    <ClCompile Include="..\common\libtommath\mp_grow.c" />
+    <ClCompile Include="..\common\libtommath\mp_hash.c" />
+    <ClCompile Include="..\common\libtommath\mp_init.c" />
+    <ClCompile Include="..\common\libtommath\mp_init_copy.c" />
+    <ClCompile Include="..\common\libtommath\mp_init_i32.c" />
+    <ClCompile Include="..\common\libtommath\mp_init_i64.c" />
+    <ClCompile Include="..\common\libtommath\mp_init_l.c" />
+    <ClCompile Include="..\common\libtommath\mp_init_multi.c" />
+    <ClCompile Include="..\common\libtommath\mp_init_set.c" />
+    <ClCompile Include="..\common\libtommath\mp_init_size.c" />
+    <ClCompile Include="..\common\libtommath\mp_init_u32.c" />
+    <ClCompile Include="..\common\libtommath\mp_init_u64.c" />
+    <ClCompile Include="..\common\libtommath\mp_init_ul.c" />
+    <ClCompile Include="..\common\libtommath\mp_invmod.c" />
+    <ClCompile Include="..\common\libtommath\mp_is_square.c" />
+    <ClCompile Include="..\common\libtommath\mp_kronecker.c" />
+    <ClCompile Include="..\common\libtommath\mp_lcm.c" />
+    <ClCompile Include="..\common\libtommath\mp_log_n.c" />
+    <ClCompile Include="..\common\libtommath\mp_lshd.c" />
+    <ClCompile Include="..\common\libtommath\mp_mod.c" />
+    <ClCompile Include="..\common\libtommath\mp_mod_2d.c" />
+    <ClCompile Include="..\common\libtommath\mp_montgomery_calc_normalization.c" />
+    <ClCompile Include="..\common\libtommath\mp_montgomery_reduce.c" />
+    <ClCompile Include="..\common\libtommath\mp_montgomery_setup.c" />
+    <ClCompile Include="..\common\libtommath\mp_mul.c" />
+    <ClCompile Include="..\common\libtommath\mp_mulmod.c" />
+    <ClCompile Include="..\common\libtommath\mp_mul_2.c" />
+    <ClCompile Include="..\common\libtommath\mp_mul_2d.c" />
+    <ClCompile Include="..\common\libtommath\mp_mul_d.c" />
+    <ClCompile Include="..\common\libtommath\mp_neg.c" />
+    <ClCompile Include="..\common\libtommath\mp_or.c" />
+    <ClCompile Include="..\common\libtommath\mp_pack.c" />
+    <ClCompile Include="..\common\libtommath\mp_pack_count.c" />
+    <ClCompile Include="..\common\libtommath\mp_prime_fermat.c" />
+    <ClCompile Include="..\common\libtommath\mp_prime_frobenius_underwood.c" />
+    <ClCompile Include="..\common\libtommath\mp_prime_is_prime.c" />
+    <ClCompile Include="..\common\libtommath\mp_prime_miller_rabin.c" />
+    <ClCompile Include="..\common\libtommath\mp_prime_next_prime.c" />
+    <ClCompile Include="..\common\libtommath\mp_prime_rabin_miller_trials.c" />
+    <ClCompile Include="..\common\libtommath\mp_prime_rand.c" />
+    <ClCompile Include="..\common\libtommath\mp_prime_strong_lucas_selfridge.c" />
+    <ClCompile Include="..\common\libtommath\mp_radix_size.c" />
+    <ClCompile Include="..\common\libtommath\mp_radix_size_overestimate.c" />
+    <ClCompile Include="..\common\libtommath\mp_rand.c" />
+    <ClCompile Include="..\common\libtommath\mp_rand_source.c" />
+    <ClCompile Include="..\common\libtommath\mp_read_radix.c" />
+    <ClCompile Include="..\common\libtommath\mp_reduce.c" />
+    <ClCompile Include="..\common\libtommath\mp_reduce_2k.c" />
+    <ClCompile Include="..\common\libtommath\mp_reduce_2k_l.c" />
+    <ClCompile Include="..\common\libtommath\mp_reduce_2k_setup.c" />
+    <ClCompile Include="..\common\libtommath\mp_reduce_2k_setup_l.c" />
+    <ClCompile Include="..\common\libtommath\mp_reduce_is_2k.c" />
+    <ClCompile Include="..\common\libtommath\mp_reduce_is_2k_l.c" />
+    <ClCompile Include="..\common\libtommath\mp_reduce_setup.c" />
+    <ClCompile Include="..\common\libtommath\mp_root_n.c" />
+    <ClCompile Include="..\common\libtommath\mp_rshd.c" />
+    <ClCompile Include="..\common\libtommath\mp_sbin_size.c" />
+    <ClCompile Include="..\common\libtommath\mp_set.c" />
+    <ClCompile Include="..\common\libtommath\mp_set_double.c" />
+    <ClCompile Include="..\common\libtommath\mp_set_i32.c" />
+    <ClCompile Include="..\common\libtommath\mp_set_i64.c" />
+    <ClCompile Include="..\common\libtommath\mp_set_l.c" />
+    <ClCompile Include="..\common\libtommath\mp_set_u32.c" />
+    <ClCompile Include="..\common\libtommath\mp_set_u64.c" />
+    <ClCompile Include="..\common\libtommath\mp_set_ul.c" />
+    <ClCompile Include="..\common\libtommath\mp_shrink.c" />
+    <ClCompile Include="..\common\libtommath\mp_signed_rsh.c" />
+    <ClCompile Include="..\common\libtommath\mp_sqrmod.c" />
+    <ClCompile Include="..\common\libtommath\mp_sqrt.c" />
+    <ClCompile Include="..\common\libtommath\mp_sqrtmod_prime.c" />
+    <ClCompile Include="..\common\libtommath\mp_sub.c" />
+    <ClCompile Include="..\common\libtommath\mp_submod.c" />
+    <ClCompile Include="..\common\libtommath\mp_sub_d.c" />
+    <ClCompile Include="..\common\libtommath\mp_to_radix.c" />
+    <ClCompile Include="..\common\libtommath\mp_to_sbin.c" />
+    <ClCompile Include="..\common\libtommath\mp_to_ubin.c" />
+    <ClCompile Include="..\common\libtommath\mp_ubin_size.c" />
+    <ClCompile Include="..\common\libtommath\mp_unpack.c" />
+    <ClCompile Include="..\common\libtommath\mp_xor.c" />
+    <ClCompile Include="..\common\libtommath\mp_zero.c" />
+    <ClCompile Include="..\common\libtommath\s_mp_add.c" />
+    <ClCompile Include="..\common\libtommath\s_mp_copy_digs.c" />
+    <ClCompile Include="..\common\libtommath\s_mp_div_3.c" />
+    <ClCompile Include="..\common\libtommath\s_mp_div_recursive.c" />
+    <ClCompile Include="..\common\libtommath\s_mp_div_school.c" />
+    <ClCompile Include="..\common\libtommath\s_mp_div_small.c" />
+    <ClCompile Include="..\common\libtommath\s_mp_exptmod.c" />
+    <ClCompile Include="..\common\libtommath\s_mp_exptmod_fast.c" />
+    <ClCompile Include="..\common\libtommath\s_mp_get_bit.c" />
+    <ClCompile Include="..\common\libtommath\s_mp_invmod.c" />
+    <ClCompile Include="..\common\libtommath\s_mp_invmod_odd.c" />
+    <ClCompile Include="..\common\libtommath\s_mp_log.c" />
+    <ClCompile Include="..\common\libtommath\s_mp_log_2expt.c" />
+    <ClCompile Include="..\common\libtommath\s_mp_log_d.c" />
+    <ClCompile Include="..\common\libtommath\s_mp_montgomery_reduce_comba.c" />
+    <ClCompile Include="..\common\libtommath\s_mp_mul.c" />
+    <ClCompile Include="..\common\libtommath\s_mp_mul_balance.c" />
+    <ClCompile Include="..\common\libtommath\s_mp_mul_comba.c" />
+    <ClCompile Include="..\common\libtommath\s_mp_mul_high.c" />
+    <ClCompile Include="..\common\libtommath\s_mp_mul_high_comba.c" />
+    <ClCompile Include="..\common\libtommath\s_mp_mul_karatsuba.c" />
+    <ClCompile Include="..\common\libtommath\s_mp_mul_toom.c" />
+    <ClCompile Include="..\common\libtommath\s_mp_prime_is_divisible.c" />
+    <ClCompile Include="..\common\libtommath\s_mp_prime_tab.c" />
+    <ClCompile Include="..\common\libtommath\s_mp_radix_map.c" />
+    <ClCompile Include="..\common\libtommath\s_mp_radix_size_overestimate.c" />
+    <ClCompile Include="..\common\libtommath\s_mp_rand_platform.c" />
+    <ClCompile Include="..\common\libtommath\s_mp_sqr.c" />
+    <ClCompile Include="..\common\libtommath\s_mp_sqr_comba.c" />
+    <ClCompile Include="..\common\libtommath\s_mp_sqr_karatsuba.c" />
+    <ClCompile Include="..\common\libtommath\s_mp_sqr_toom.c" />
+    <ClCompile Include="..\common\libtommath\s_mp_sub.c" />
+    <ClCompile Include="..\common\libtommath\s_mp_zero_buf.c" />
+    <ClCompile Include="..\common\libtommath\s_mp_zero_digs.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\minilzo-2.10\minilzo\lzoconf.h" />
@@ -370,20 +754,30 @@
     <ClInclude Include="d8u\buffer.hpp" />
     <ClInclude Include="d8u\cmd.hpp" />
     <ClInclude Include="d8u\crypto.hpp" />
+    <ClInclude Include="d8u\cryptopp_crypto.hpp" />
+    <ClInclude Include="d8u\cryptopp_hash.hpp" />
     <ClInclude Include="d8u\encode.hpp" />
     <ClInclude Include="d8u\hash.hpp" />
+    <ClInclude Include="d8u\init.hpp" />
     <ClInclude Include="d8u\json.hpp" />
+    <ClInclude Include="d8u\ltc.hpp" />
+    <ClInclude Include="d8u\ltc_crypto.hpp" />
+    <ClInclude Include="d8u\ltc_hash.hpp" />
     <ClInclude Include="d8u\memory.hpp" />
+    <ClInclude Include="d8u\naive_crypto.hpp" />
+    <ClInclude Include="d8u\naive_hash.hpp" />
+    <ClInclude Include="d8u\research_crypto.hpp" />
+    <ClInclude Include="d8u\research_hash.hpp" />
     <ClInclude Include="d8u\string.hpp" />
     <ClInclude Include="d8u\string_switch.hpp" />
     <ClInclude Include="d8u\test.hpp" />
+    <ClInclude Include="d8u\test_crypto.hpp" />
     <ClInclude Include="d8u\time.hpp" />
     <ClInclude Include="d8u\transform.hpp" />
     <ClInclude Include="d8u\tsm.hpp" />
     <ClInclude Include="d8u\util.hpp" />
     <ClInclude Include="d8u\win32_misc.h" />
     <ClInclude Include="gsl-lite.hpp" />
-    <ClInclude Include="ltc.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\common\minilzo-2.10\minilzo\COPYING" />

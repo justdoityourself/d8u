@@ -21,7 +21,7 @@ namespace d8u
 
 
 		namespace detail {
-			void* allocate_aligned_memory(size_t align, size_t size)
+			inline void* allocate_aligned_memory(size_t align, size_t size)
 			{
 				if (size == 0)
 					return nullptr;
@@ -36,7 +36,7 @@ namespace d8u
 			}
 
 
-			void deallocate_aligned_memory(void* ptr) noexcept
+			inline void deallocate_aligned_memory(void* ptr) noexcept
 			{
 #ifdef _WIN32
 				return _aligned_free(ptr);
@@ -237,7 +237,7 @@ namespace d8u
 	template < typename T, std::size_t N > constexpr size_t __array_element_size(const T(&)[N]) { return (size_t)sizeof(T); }
 	template < typename T > constexpr size_t __array_bytes(T& t) { return __array_elements(t) * __array_element_size(t); }
 
-	vector<uint8_t> htob(std::string_view v)
+	inline vector<uint8_t> htob(std::string_view v)
 	{
 		std::vector<uint8_t> result; result.reserve(v.size() / 2 + 1);
 		auto ctoi = [](char c)
