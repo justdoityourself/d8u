@@ -5,7 +5,9 @@
 #include <array>
 #include <vector>
 
+extern "C" {
 #include "tomcrypt.h"
+}
 
 
 #include "hash.hpp"

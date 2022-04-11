@@ -6,7 +6,9 @@
 #include <vector>
 #include <chrono>
 
+extern "C" {
 #include "tomcrypt.h"
+}
 
 
 #include "hash.hpp"

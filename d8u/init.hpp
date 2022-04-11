@@ -7,7 +7,10 @@ bool d8u_init() {
 	return true;
 }
 #elif D8U_LTC
+extern "C" {
 #include "tomcrypt.h"
+}
+
 
 bool d8u_init() {
 	crypt_mp_init("l");

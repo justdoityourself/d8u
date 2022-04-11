@@ -5,7 +5,9 @@
 #include <vector>
 #include <array>
 
+extern "C" {
 #include "tomcrypt.h"
+}
 
 #include "../gsl-lite.hpp"
 

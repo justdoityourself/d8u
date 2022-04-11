@@ -760,6 +760,7 @@
     <ClInclude Include="d8u\hash.hpp" />
     <ClInclude Include="d8u\init.hpp" />
     <ClInclude Include="d8u\json.hpp" />
+    <ClInclude Include="d8u\json_builder.hpp" />
     <ClInclude Include="d8u\ltc.hpp" />
     <ClInclude Include="d8u\ltc_crypto.hpp" />
     <ClInclude Include="d8u\ltc_hash.hpp" />

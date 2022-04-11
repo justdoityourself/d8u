@@ -1247,6 +1247,9 @@
     <ClInclude Include="d8u\test_crypto.hpp">
       <Filter>d8u</Filter>
     </ClInclude>
+    <ClInclude Include="d8u\json_builder.hpp">
+      <Filter>d8u</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />
