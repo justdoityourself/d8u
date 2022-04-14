@@ -24,6 +24,13 @@ namespace d8u
 			return i;
 		}
 
+		auto split_pair(const std::string_view target, std::string_view delimiter)
+		{
+			size_t del = target.find(delimiter);
+
+			return std::make_pair(std::string_view(target.data(),del),std::string_view(target.data()+del,target.size()-del));
+		}
+
 
 		constexpr char hexmap[] = { '0', '1', '2', '3', '4', '5', '6', '7',
 									'8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };

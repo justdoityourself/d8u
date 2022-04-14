@@ -95,7 +95,7 @@ namespace d8u
 		{
 			rsa_key key;
 			const int bitsize = 4096;
-			const size_t bytesize = bitsize * 8 / 8; //Guess
+			const unsigned long bytesize = bitsize * 8 / 8; //Guess
 		public:
 			PrivatePassword() { }
 
@@ -176,7 +176,7 @@ namespace d8u
 		{
 			rsa_key key;
 			const int bitsize = 4096;
-			const size_t bytesize = bitsize * 8 / 8; //Guess
+			const unsigned long bytesize = bitsize * 8 / 8; //Guess
 
 		public:
 			PublicPassword() {}
