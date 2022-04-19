@@ -1,3 +1,7 @@
+/* Copyright (C) 2022 D8DATAWORKS - All Rights Reserved */
+
+#pragma once
+
 #include <string_view>
 
 namespace d8u
