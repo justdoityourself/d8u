@@ -1304,10 +1304,36 @@ namespace d8u
 		typedef JsonIndexT<IndexStream, JsonObjectMax> JsonReaderL;
 		typedef JsonIndexT<IndexStreamH, JsonObjectMax> JsonReaderH;
 
+		class JsonReaderAny
+		{
+		public:
+			JsonReaderAny() {
+				//TODO ANY READER
+			}
+
+			~JsonReaderAny() {
+
+			}
+		private:
+		};
+
+		//typedef JsonReaderAny JsonReader;
+
+		auto WithJson(auto json, auto f)
+		{
+			JsonReader index(json);
+
+			return f(index);
+		}
+
 		template < typename F, typename S > auto JsonCompare(const F& first, const S& second)
 		{
 			return JsonReader(first).Compare(JsonReader(second));
 		}
+
+
+
+
 
 #ifndef D8ULEAN
 		template <typename T> class JsonMapT : public T
@@ -1345,4 +1371,6 @@ namespace d8u
 		typedef JsonMapT<JsonReaderL> JsonMapL;
 #endif
 	}
+
+
 }
