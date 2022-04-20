@@ -753,6 +753,7 @@
     <ClInclude Include="d8u\benchmark.hpp" />
     <ClInclude Include="d8u\buffer.hpp" />
     <ClInclude Include="d8u\cmd.hpp" />
+    <ClInclude Include="d8u\console.hpp" />
     <ClInclude Include="d8u\crypto.hpp" />
     <ClInclude Include="d8u\cryptopp_crypto.hpp" />
     <ClInclude Include="d8u\cryptopp_hash.hpp" />
@@ -774,6 +775,7 @@
     <ClInclude Include="d8u\test.hpp" />
     <ClInclude Include="d8u\test_crypto.hpp" />
     <ClInclude Include="d8u\time.hpp" />
+    <ClInclude Include="d8u\time_series.hpp" />
     <ClInclude Include="d8u\transform.hpp" />
     <ClInclude Include="d8u\tsm.hpp" />
     <ClInclude Include="d8u\util.hpp" />

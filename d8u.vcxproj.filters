@@ -1250,6 +1250,12 @@
     <ClInclude Include="d8u\json_builder.hpp">
       <Filter>d8u</Filter>
     </ClInclude>
+    <ClInclude Include="d8u\console.hpp">
+      <Filter>d8u</Filter>
+    </ClInclude>
+    <ClInclude Include="d8u\time_series.hpp">
+      <Filter>d8u</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />
