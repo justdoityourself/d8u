@@ -13,9 +13,16 @@ namespace d8u
 			JsonBuilder& parent;
 			std::string_view key;
 
-			void operator= (const auto value)
+			void operator= (auto value)
 			{
 				constexpr bool is_num = std::is_arithmetic_v<decltype(value)>;
+				constexpr bool has_size = requires(const decltype(value) & t) { t.size(); };
+
+				if constexpr (has_size)
+				{
+					if (!value.size())
+						return;
+				}
 
 				if (parent.c++)
 					parent.data += ",";
@@ -28,7 +35,7 @@ namespace d8u
 				if constexpr (is_num) parent.data += std::to_string(value);
 				else {
 					if (value[0] != '{') parent.data += "\"";
-					parent.data += value;
+					parent.data += std::string_view(value);
 					if (value[0] != '{') parent.data += "\"";
 				}
 			}
