@@ -48,13 +48,13 @@ namespace d8u
 				valb += 8;
 				while (valb >= 0)
 				{
-					out.push_back("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789._"[(val >> valb) & 0x3F]);
+					out.push_back("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789[]"[(val >> valb) & 0x3F]);
 					valb -= 6;
 				}
 			}
 
 			if (valb > -6)
-				out.push_back("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789._"[((val << 8) >> (valb + 8)) & 0x3F]);
+				out.push_back("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789[]"[((val << 8) >> (valb + 8)) & 0x3F]);
 
 			while (out.size() % 4) out.push_back('-');
 
@@ -127,7 +127,7 @@ namespace d8u
 			std::array<int, 256> T;
 			T.fill(-1);
 			for (int i = 0; i < 64; i++)
-				T["ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789._"[i]] = i;
+				T["ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789[]"[i]] = i;
 
 			int val = 0, dx = 0, valb = -8;
 			for (uint8_t c : in)
@@ -156,7 +156,7 @@ namespace d8u
 			std::array<int, 256> T;
 			T.fill(-1);
 			for (int i = 0; i < 64; i++)
-				T["ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789._"[i]] = i;
+				T["ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789[]"[i]] = i;
 
 			int val = 0, valb = -8;
 			for (uint8_t c : in)
