@@ -79,7 +79,11 @@ namespace d8u
 
     void Clear()
     {
+#ifdef _WIN32
         system("cls");
+#else
+        system("clear"); 
+#endif
     }
 
     void WithRedraw(auto f)

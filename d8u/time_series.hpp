@@ -74,7 +74,7 @@ namespace d8u
 
 			ji.ForEachValue([&](auto k, auto v)
 			{
-				result += k;
+				result += std::string_view(k);
 				result += ":";
 				result += match_width(v, jt[k], (int)v != 0);
 				result += '\t';
@@ -85,7 +85,7 @@ namespace d8u
 			jt.ForEachValue([&](auto k, auto v)
 			{
 				auto v2 = ji[k];
-				result += k;
+				result += std::string_view(k);
 				result += ":";
 				result += match_width(v,v2, (int)v2 != 0);
 				result += '\t';
