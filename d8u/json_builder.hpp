@@ -129,13 +129,25 @@ namespace d8u
 
 		void Value(auto value)
 		{
-			constexpr bool has_qr = requires(const decltype(value) & t) { t.TryQuoteWrapper(); };
+			//constexpr bool has_qr = requires(const decltype(value) & t) { t.TryQuoteWrapper(); };
 			constexpr bool is_num = std::is_arithmetic_v<decltype(value)>;
+			constexpr bool has_size = requires(const decltype(value) & t) { t.size(); };
 
-			if constexpr (has_qr) value.TryQuoteWrapper();
+			if constexpr (has_size)
+			{
+				if (!value.size())
+					return;
+			}
+
+			//if constexpr (has_qr) value.TryQuoteWrapper();
 
 			if constexpr (is_num) data += std::to_string(value);
-			else data += std::string_view(value);
+			else
+			{
+				if (value[0] != '{') data += "\"";
+				data += std::string_view(value);
+				if (value[0] != '{') data += "\"";
+			}
 		}
 
 		void KV(auto key, auto value)
