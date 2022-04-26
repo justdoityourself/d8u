@@ -727,7 +727,7 @@ namespace d8u
 				{
 					auto& object = Object();
 
-					for (uint32_t i = 0; i < object.size(); i++)
+					for (uint32_t i = 0; i < object.count; i++)
 					{
 						auto* e = object.Find(i);
 						if (!e) break;
@@ -742,7 +742,7 @@ namespace d8u
 				{
 					auto& arr = Array();
 
-					for (uint32_t i = 0; i < arr.size(); i++)
+					for (uint32_t i = 0; i < arr.count; i++)
 					{
 						auto* e = arr.Find(i);
 						if (!e) break;
@@ -763,7 +763,7 @@ namespace d8u
 				{
 					auto& object = Object();
 
-					for (uint32_t i = 0; i < object.size(); i++)
+					for (uint32_t i = 0; i < object.count; i++)
 					{
 						auto* e = object.Find(i);
 						if (!e) break;
@@ -778,7 +778,7 @@ namespace d8u
 				{
 					auto& arr = Array();
 
-					for (uint32_t i = 0; i < arr.size(); i++)
+					for (uint32_t i = 0; i < arr.count; i++)
 					{
 						auto* e = arr.Find(i);
 						if (!e) break;
@@ -799,7 +799,7 @@ namespace d8u
 				{
 					auto& object = Object();
 
-					for (uint32_t i = 0; i < object.size(); i++)
+					for (uint32_t i = 0; i < object.count; i++)
 					{
 						auto* e = object.Find(i);
 						if (!e) break;
@@ -812,7 +812,7 @@ namespace d8u
 				{
 					auto& arr = Array();
 
-					for (uint32_t i = 0; i < arr.size(); i++)
+					for (uint32_t i = 0; i < arr.count; i++)
 					{
 						auto* e = arr.Find(i);
 						if (!e) break;
@@ -831,7 +831,7 @@ namespace d8u
 				{
 					auto& object = Object();
 
-					for (uint32_t i = 0; i < object.size(); i++)
+					for (uint32_t i = 0; i < object.count; i++)
 					{
 						auto* e = object.Find(i);
 						if (!e) break;
@@ -844,7 +844,7 @@ namespace d8u
 				{
 					auto& arr = Array();
 
-					for (uint32_t i = 0; i < arr.size(); i++)
+					for (uint32_t i = 0; i < arr.count; i++)
 					{
 						auto* e = arr.Find(i);
 						if (!e) break;
@@ -861,6 +861,26 @@ namespace d8u
 
 			uint8_t* data() const { if (!Valid()) return nullptr; return root->String(_json.data()).data(); }
 			uint32_t size() const { if (!Valid()) return 0; return (uint32_t)root->String(_json.data()).size(); }
+			uint32_t count() const { if (!Valid()) return 0; return (uint32_t)Object().count; }
+			std::string key(const Memory& e) const
+			{
+				if (!Valid())return "";
+
+				auto* o = Object().Find(e);
+				if (!o)return "";
+
+				return o->Key(_json.data());
+			}
+
+			std::string key(uint32_t e) const
+			{
+				if (!Valid())return "";
+
+				auto* o = Object().Find(e);
+				if (!o)return "";
+
+				return o->Key(_json.data());
+			}
 
 			bool isObject() const { return root->type == JsonStream::Types::TypeObject; }
 			bool isArray() const { return root->type == JsonStream::Types::TypeArray; }
