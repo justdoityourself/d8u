@@ -161,6 +161,11 @@ namespace d8u
 			return { *this,key };
 		}
 
+		void Reopen()
+		{
+			data[data.size() - 1] = ',';
+		}
+
 		void Splice(auto main, auto key, auto value) {
 			constexpr bool is_num = std::is_arithmetic_v<decltype(value)>;
 
@@ -172,6 +177,26 @@ namespace d8u
 			if constexpr (is_num) data += std::to_string(value);
 			else data += std::string_view(value);
 			data += "}";
+		}
+
+		void PurgeOpen(auto value, auto _key)
+		{
+			auto main = std::string_view(value);
+			auto key = std::string_view(_key);
+
+			int cut = -1;
+			for (int i = (int)main.size() - 2, j = 0; i >= 0; i--, j++)
+			{
+				if (main[i] == '}') break;
+				if (j >= key.size() && key == std::string_view(main.data() + i, key.size())) {
+					cut = i;
+					break;
+				}
+			}
+
+			main = std::string_view(main.data(), cut);
+
+			data += std::string_view(main);
 		}
 
 		void Purge(auto _main, auto _key, auto value)
