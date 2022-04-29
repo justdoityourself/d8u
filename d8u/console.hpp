@@ -68,6 +68,10 @@ namespace d8u
         return std::string("\033") + BrightGreen + std::string(c) + std::string("\033") + White;
     }
 
+    std::string bred(const auto& c) {
+        return std::string("\033") + BrightRed + std::string(c) + std::string("\033") + White;
+    }
+
     std::string bwhite(const auto& c) {
         return std::string("\033") + BrightWhite + std::string(c) + std::string("\033") + White;
     }
