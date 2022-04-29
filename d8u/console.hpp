@@ -60,6 +60,10 @@ namespace d8u
         return std::string("\033") + Yellow + std::string(c) + std::string("\033") + White;
     }
 
+    std::string byellow(const auto& c) {
+        return std::string("\033") + BrightYellow + std::string(c) + std::string("\033") + White;
+    }
+
     std::string green(const auto& c) {
         return std::string("\033") + Green + std::string(c) + std::string("\033") + White;
     }
