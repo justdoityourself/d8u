@@ -28,7 +28,9 @@ namespace d8u
 		{
 			size_t del = target.find(delimiter);
 
-			return std::make_pair(std::string_view(target.data(),del),std::string_view(target.data()+del+1,target.size()-(del+1)));
+			return del == -1 
+				? std::make_pair(target,"")
+				: std::make_pair(std::string_view(target.data(),del),std::string_view(target.data()+del+1,target.size()-(del+1)));
 		}
 
 
