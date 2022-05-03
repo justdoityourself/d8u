@@ -733,9 +733,9 @@ namespace d8u
 						if (!e) break;
 
 						if (e->IsNode())
-							f(e->Key(_json.data()), e->Value(_json.data(), index), i, JsonIndexBase(_json, index, &e->Node(index), allocator));
+							f(e->Key(_json.data()), e->Value(_json.data()), i, JsonIndexBase(_json, index, &e->Node(index), allocator));
 						else
-							f(e->Key(_json.data()), e->Value(_json.data(), index), i, JsonIndexBase());
+							f(e->Key(_json.data()), e->Value(_json.data()), i, JsonIndexBase());
 					}
 				}
 				else
@@ -748,9 +748,9 @@ namespace d8u
 						if (!e) break;
 
 						if (e->IsNode())
-							f(Memory(""), e->Value(_json.data(), index), i, JsonIndexBase(_json, index, &e->Node(index), allocator));
+							f(Memory(""), e->Value(_json.data()), i, JsonIndexBase(_json, index, &e->Node(index), allocator));
 						else
-							f(Memory(""), e->Value(_json.data(), index), i, JsonIndexBase());
+							f(Memory(""), e->Value(_json.data()), i, JsonIndexBase());
 					}
 				}
 			}
