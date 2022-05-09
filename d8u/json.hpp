@@ -1218,6 +1218,9 @@ namespace d8u
 				auto add_value = [&](auto value) { value.TryQuoteWrapper();  result += std::string_view(value); };
 
 				ForEach([&](auto key, auto value, auto index) {
+					if (key == "_vmt" || key == "_bmt" || key == "_cmt")
+						return;
+
 					add_key(key);
 					auto rvalue = right.Find(key);
 					if (rvalue.size())
@@ -1239,6 +1242,9 @@ namespace d8u
 					});
 
 				right.ForEach([&](auto key, auto value, auto index) {
+					if (key == "_vmt" || key == "_bmt" || key == "_cmt")
+						return;
+
 					auto lvalue = Find(key);
 
 					if (!lvalue.size())

@@ -29,7 +29,8 @@ namespace d8u
 #ifdef _WIN32
 				void* ptr = _aligned_malloc(size, align);
 #else
-				void* ptr = aligned_alloc(size, align);
+				//void* ptr = aligned_alloc(size, align);
+				void* ptr = malloc(size);
 #endif
 
 				return ptr;
