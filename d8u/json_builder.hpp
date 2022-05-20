@@ -100,6 +100,8 @@ namespace d8u
 			data.reserve(target_size);
 		}
 
+		JsonPiecemeal() {}
+
 		void Open() {
 			data += "{";
 			depth++;

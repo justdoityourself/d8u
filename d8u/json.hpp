@@ -1357,7 +1357,11 @@ namespace d8u
 			return JsonReader(first).Compare(JsonReader(second));
 		}
 
-
+		class JsonScanner
+		{
+			//Single pass iteration, sequential IO version of Random IO JsonReader
+			//
+		};
 
 
 
