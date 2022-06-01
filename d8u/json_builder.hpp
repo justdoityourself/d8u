@@ -245,6 +245,10 @@ namespace d8u
 			data += "}";
 		}
 
+		void Raw(const auto& _data) {
+			data += _data;
+		}
+
 		auto size() { return data.size(); }
 		auto Claim() { return std::move(data); }
 	private:

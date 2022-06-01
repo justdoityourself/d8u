@@ -889,7 +889,17 @@ namespace d8u
 
 			std::string_view Json() const { if (!Valid()) return std::string_view(); return root->StringView(_json.data()); }
 
+			auto SplitAt(const Memory& e) const
+			{ 
+				auto seg = Find(e);
 
+				auto full = root->String(_json.data());
+
+				auto start_offset = seg.data() - full.data();
+				auto end_offset = start_offset + seg.size();
+				
+				return std::make_pair(std::string_view((char*)full.data(),start_offset), std::string_view((char*)(full.data()+end_offset),full.size()-end_offset));
+			}
 
 			template< typename R > std::string Merge(const R& right)
 			{
@@ -972,6 +982,9 @@ namespace d8u
 				auto add_value = [&](auto value) { value.TryQuoteWrapper();  result += value; };
 
 				ForEach([&](auto key, auto value, auto index) {
+					if (key == "_vmt" || key == "_bmt" || key == "_cmt")
+						return;
+
 					add_key(key);
 					auto rvalue = right.Find(key);
 					add_value((rvalue.size()) ? rvalue : value);
