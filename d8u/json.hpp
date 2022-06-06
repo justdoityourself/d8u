@@ -1372,8 +1372,73 @@ namespace d8u
 
 		class JsonScanner
 		{
-			//Single pass iteration, sequential IO version of Random IO JsonReader
-			//
+		public:
+			template < typename J, typename K, typename A, typename V>  static void Stream(J& input, K k , A a, V v)
+			{
+				size_t scan = 0;
+
+				while (scan < input.size() && (input[scan] == '\n' || input[scan] == '\r' || input[scan] == '\t' || input[scan] == ' ')) scan++;
+
+				if (scan && input[scan] == '{')
+					input = input.Slice(scan);
+
+				IndexObject(input, k,a,v);
+			}
+
+			template < typename J, typename K, typename A, typename V> static void Index(const J& input, K k, A a, V v) { Memory i(input); return Stream(i, k,a,v); }
+
+		private:
+
+			template < typename K, typename A, typename V> static void IndexObject(Memory& input, K k, A a, V v)
+			{
+				JsonStream::StreamObject(input, [&](JsonStream::Types type, JsonStream::StreamContext& context) 
+				{
+					switch (type)
+					{
+					case JsonStream::Types::TypeUndetermined:
+					case JsonStream::Types::TypeString:
+						v(Memory(context.key, context.key_length), Memory(context.value, context.value_length));
+						break;
+					case JsonStream::Types::TypeArray:
+						a(Memory(context.key, context.key_length));
+						IndexArray(input, k,v,a);
+						break;
+					case JsonStream::Types::TypeObject:
+						k(Memory(context.key, context.key_length));
+						IndexObject(input, k, v, a);
+						break;
+					default:
+					case JsonStream::Types::TypeParseFinished:
+						break;
+					}
+				});
+			}
+
+			template < typename K, typename A, typename V> static void IndexArray(Memory& input, K k, A a, V v)
+			{
+				auto start_offset = input.data();
+				JsonStream::StreamArray(input, [&](JsonStream::Types type, JsonStream::StreamContext& context) {
+
+					switch (type)
+					{
+					case JsonStream::Types::TypeUndetermined:
+					case JsonStream::Types::TypeString:
+						v(Memory(&context.current_key, sizeof(context.current_key)), Memory(context.value, context.value_length));
+						break;
+					case JsonStream::Types::TypeArray:
+						a(Memory(&context.current_key, sizeof(context.current_key)));
+						IndexArray(input, k, v, a);
+						break;
+					case JsonStream::Types::TypeObject:
+						k(Memory(&context.current_key, sizeof(context.current_key)));
+						IndexObject(input, k, v, a);
+						break;
+					default:
+					case JsonStream::Types::TypeParseFinished:
+						break;
+					}
+				});
+			}
 		};
 
 
