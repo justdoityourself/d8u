@@ -286,6 +286,13 @@ namespace d8u
 			return t;
 		}
 
+		template <typename T, typename ...Params> T& singleton(Params&&... params)
+		{
+			static T t(std::forward<Params>(params)...);
+
+			return t;
+		}
+
 		template <typename T> using upair = std::pair<T, T>;
 		template <typename T> using utri = std::tuple<T, T, T>;
 

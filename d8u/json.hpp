@@ -7,6 +7,7 @@
 #include <array>
 #include <string_view>
 #include <charconv>
+#include <bit>
 
 #include "memory.hpp"
 #include "util.hpp"
@@ -1373,7 +1374,11 @@ namespace d8u
 		class JsonScanner
 		{
 		public:
-			template < typename J, typename K, typename A, typename V>  static void Stream(J& input, K k , A a, V v)
+			template < typename J, typename K, typename A, typename V, typename P> static void Scan(const J& input, K k, A a, V v, P p) { Memory i(input); return Stream(i, k,a,v, p); }
+
+		private:
+
+			template < typename J, typename K, typename A, typename V, typename P>  static void Stream(J& input, K k, A a, V v, P p)
 			{
 				size_t scan = 0;
 
@@ -1382,39 +1387,36 @@ namespace d8u
 				if (scan && input[scan] == '{')
 					input = input.Slice(scan);
 
-				IndexObject(input, k,a,v);
+				IndexObject(input, k, a, v, p);
 			}
 
-			template < typename J, typename K, typename A, typename V> static void Index(const J& input, K k, A a, V v) { Memory i(input); return Stream(i, k,a,v); }
-
-		private:
-
-			template < typename K, typename A, typename V> static void IndexObject(Memory& input, K k, A a, V v)
+			template < typename K, typename A, typename V, typename P> static void IndexObject(Memory& input, K k, A a, V v, P p)
 			{
-				JsonStream::StreamObject(input, [&](JsonStream::Types type, JsonStream::StreamContext& context) 
-				{
-					switch (type)
+				JsonStream::StreamObject(input, [&](JsonStream::Types type, JsonStream::StreamContext& context)
 					{
-					case JsonStream::Types::TypeUndetermined:
-					case JsonStream::Types::TypeString:
-						v(Memory(context.key, context.key_length), Memory(context.value, context.value_length));
-						break;
-					case JsonStream::Types::TypeArray:
-						a(Memory(context.key, context.key_length));
-						IndexArray(input, k,v,a);
-						break;
-					case JsonStream::Types::TypeObject:
-						k(Memory(context.key, context.key_length));
-						IndexObject(input, k, v, a);
-						break;
-					default:
-					case JsonStream::Types::TypeParseFinished:
-						break;
-					}
-				});
+						switch (type)
+						{
+						case JsonStream::Types::TypeUndetermined:
+						case JsonStream::Types::TypeString:
+							v(Memory(context.key, context.key_length), Memory(context.value, context.value_length),false);
+							break;
+						case JsonStream::Types::TypeArray:
+							a(Memory(context.key, context.key_length), false);
+							IndexArray(input, k, v, a);
+							break;
+						case JsonStream::Types::TypeObject:
+							k(Memory(context.key, context.key_length), false);
+							IndexObject(input, k, v, a);
+							break;
+						default:
+						case JsonStream::Types::TypeParseFinished:
+							p(false);
+							break;
+						}
+					});
 			}
 
-			template < typename K, typename A, typename V> static void IndexArray(Memory& input, K k, A a, V v)
+			template < typename K, typename A, typename V, typename P> static void IndexArray(Memory& input, K k, A a, V v, P p)
 			{
 				auto start_offset = input.data();
 				JsonStream::StreamArray(input, [&](JsonStream::Types type, JsonStream::StreamContext& context) {
@@ -1423,24 +1425,94 @@ namespace d8u
 					{
 					case JsonStream::Types::TypeUndetermined:
 					case JsonStream::Types::TypeString:
-						v(Memory(&context.current_key, sizeof(context.current_key)), Memory(context.value, context.value_length));
+						v(Memory(&context.current_key, sizeof(context.current_key)), Memory(context.value, context.value_length),true);
 						break;
 					case JsonStream::Types::TypeArray:
-						a(Memory(&context.current_key, sizeof(context.current_key)));
+						a(Memory(&context.current_key, sizeof(context.current_key)), true);
 						IndexArray(input, k, v, a);
 						break;
 					case JsonStream::Types::TypeObject:
-						k(Memory(&context.current_key, sizeof(context.current_key)));
+						k(Memory(&context.current_key, sizeof(context.current_key)), true);
 						IndexObject(input, k, v, a);
 						break;
 					default:
 					case JsonStream::Types::TypeParseFinished:
+						p(true);
 						break;
 					}
-				});
+					});
 			}
 		};
 
+		template <typename H = uint64_t, size_t max_depth = 16> class JsonHash
+		{
+		public:
+			JsonHash() { }
+
+			template <typename J> void Add(const J& j)
+			{
+				size_t depth = 1;
+				H stack[max_depth]; stack[0] = 0;
+
+				H result = 0;
+
+				auto push = [&](auto& o, bool _a) {
+					if (depth == max_depth)
+						throw "Json depth exceeds limit.";
+
+					stack[depth++] = HashK(_a ? std::to_string(*((size_t*)o.data())) : o) ^ (depth ? stack[depth++] : 0);
+				};
+
+				JsonScanner::Scan(j, push, push, [&](auto& k, auto & v, bool _a){
+					result ^= stack[depth++] = AddKV(_a ? std::to_string(*((size_t*)k.data())) : k,v,stack[depth]);
+				}, [&](bool _a) { depth--; });
+
+				return hash ^= result;
+			}
+
+			H AddKV(Memory key, Memory value, H parent = 0)
+			{
+				return hash ^= Rotate(parent % (sizeof(H)*8), HashKV(key, value));
+			}
+
+			template <typename J> H Remove(const J& j) { return Add(j); }
+			H RemoveKV(Memory key, Memory value) { return AddKV(key, value); }
+
+		private:
+
+			H Rotate(size_t rotation, H target) {
+				if (!rotation) return target;
+
+				return std::rotl(target, rotation);
+			}
+
+			H HashM(Memory m, H result = 0x41feda847185c128)
+			{
+				H* p = (H*)m.data();
+
+				size_t c = m.size() / sizeof(H), r = m.size() % sizeof(H);
+
+				for (size_t i = 0; i < c; i++, p++)
+					result ^= *p;
+
+				return result ^= *p >> (r * 8);
+			}
+
+			H HashV(Memory value) {
+				return HashM(value);
+			}
+
+			H HashK(Memory key) {
+				return HashM(key, 0xef7128eab3018429);
+			}
+
+			H HashKV(Memory key, Memory value)
+			{
+				return HashK(key) ^ HashV(value);
+			}
+
+			H hash = 0xfe48ca1209bcd713;
+		};
 
 
 #ifndef D8ULEAN

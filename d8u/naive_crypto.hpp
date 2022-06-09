@@ -45,7 +45,7 @@ namespace d8u
 	template < typename D > void random_bytes_secure(D& d)
 	{
 		for (size_t i = 0; i < d.size(); i++)
-			((uint8_t*)d.data() + i) = (uint8_t)i;
+			*((uint8_t*)(d.data() + i)) = (uint8_t)i;
 	}
 
 	namespace crypto
