@@ -984,8 +984,8 @@ namespace d8u
 
 				unsigned values = 0;
 
-				auto add_key = [&](auto key) { if (values++) result += ","; result += "\""; result += key; result += "\":"; };
-				auto add_value = [&](auto value) { value.TryQuoteWrapper();  result += value; };
+				auto add_key = [&](auto key) { if (values++) result += ","; result += "\""; result += std::string_view(key); result += "\":"; };
+				auto add_value = [&](auto value) { value.TryQuoteWrapper();  result += std::string_view(value); };
 
 				ForEach([&](auto key, auto value, auto index) {
 					if (key == "_vmt" || key == "_bmt" || key == "_cmt")
