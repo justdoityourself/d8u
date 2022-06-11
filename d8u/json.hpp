@@ -963,6 +963,11 @@ namespace d8u
 
 			template< typename R > std::string Accumulate(const R& right)
 			{
+				if (!Valid() && !right.Valid())
+					return "{}";
+				else if (!Valid())
+					return std::string(right.Json());
+
 				std::string result;
 				result.reserve(size() + right.size());
 

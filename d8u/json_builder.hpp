@@ -172,7 +172,7 @@ namespace d8u
 			constexpr bool is_num = std::is_arithmetic_v<decltype(value)>;
 
 			data += std::string_view(main);
-			data[data.size() - 1] = ',';
+			data[data.size() - 1] = (data[data.size() - 2] == '{') ? ' ' : ',';
 			data += "\"";
 			data += std::string_view(key);
 			data += "\":";

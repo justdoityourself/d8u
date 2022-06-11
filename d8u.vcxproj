@@ -751,6 +751,7 @@
     <ClInclude Include="d8u\alt_crypto.hpp" />
     <ClInclude Include="d8u\async.hpp" />
     <ClInclude Include="d8u\benchmark.hpp" />
+    <ClInclude Include="d8u\bloom.hpp" />
     <ClInclude Include="d8u\buffer.hpp" />
     <ClInclude Include="d8u\cmd.hpp" />
     <ClInclude Include="d8u\console.hpp" />
