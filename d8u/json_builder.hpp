@@ -129,6 +129,12 @@ namespace d8u
 			data += "\":";
 		}
 
+		void KO(auto key)
+		{
+			Key(key);
+			Open();
+		}
+
 		void Value(auto value)
 		{
 			//constexpr bool has_qr = requires(const decltype(value) & t) { t.TryQuoteWrapper(); };

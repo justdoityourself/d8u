@@ -754,6 +754,7 @@
     <ClInclude Include="d8u\bloom.hpp" />
     <ClInclude Include="d8u\buffer.hpp" />
     <ClInclude Include="d8u\cmd.hpp" />
+    <ClInclude Include="d8u\compression.hpp" />
     <ClInclude Include="d8u\console.hpp" />
     <ClInclude Include="d8u\crypto.hpp" />
     <ClInclude Include="d8u\cryptopp_crypto.hpp" />

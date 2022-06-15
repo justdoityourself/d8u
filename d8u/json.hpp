@@ -952,7 +952,7 @@ namespace d8u
 				return result;
 			}
 
-			template< typename R > auto Compare(const R& right)
+			template< typename R > auto Compare(const R& right) const
 			{
 				auto result = std::make_pair(unsigned(0), unsigned(0));
 
@@ -961,7 +961,7 @@ namespace d8u
 				return result;
 			}
 
-			template< typename R > std::string Accumulate(const R& right)
+			template< typename R > std::string Accumulate(const R& right) const
 			{
 				if (!Valid() && !right.Valid())
 					return "{}";
@@ -972,6 +972,21 @@ namespace d8u
 				result.reserve(size() + right.size());
 
 				_Accumulate(right, result);
+
+				return result;
+			}
+
+			template< typename R1, typename R2 > std::string Accumulate2(const R1& r1, const R2& r2) const
+			{
+				if (!Valid() && !r1.Valid())
+					return "{}";
+				else if (!Valid())
+					return r1.Accumulate(r2);
+
+				std::string result;
+				result.reserve(size() + r1.size() + r2.size());
+
+				_Accumulate2(r1,r2, result);
 
 				return result;
 			}
@@ -1227,7 +1242,7 @@ namespace d8u
 				});
 			}
 
-			template< typename R > void _Accumulate(const R& right, std::string & result)
+			template< typename R > void _Accumulate(const R& right, std::string & result) const
 			{
 				result += (isObject()) ? "{" : "[";
 
@@ -1261,6 +1276,81 @@ namespace d8u
 					});
 
 				right.ForEach([&](auto key, auto value, auto index) {
+					if (key == "_vmt" || key == "_bmt" || key == "_cmt")
+						return;
+
+					auto lvalue = Find(key);
+
+					if (!lvalue.size())
+					{
+						add_key(key);
+						add_value(value);
+					}
+					}, [&](auto key, auto object, auto index) {
+						auto lobject = (*this)(key);
+
+						if (!lobject.Valid())
+						{
+							add_key(key);
+							result += object.Json();
+						}
+					});
+
+				result += (isObject()) ? "}" : "]";
+			}
+
+			template< typename R1, typename R2 > void _Accumulate2(const R1& r1, const R2& r2, std::string& result) const
+			{
+				result += (isObject()) ? "{" : "[";
+
+				unsigned values = 0;
+
+				auto add_key = [&](auto key) { if (values++) result += ","; result += "\""; result += std::string_view(key); result += "\":"; };
+				auto add_value = [&](auto value) { value.TryQuoteWrapper();  result += std::string_view(value); };
+
+				ForEach([&](auto key, auto value, auto index) {
+					if (key == "_vmt" || key == "_bmt" || key == "_cmt")
+						return;
+
+					add_key(key);
+
+					int64_t rv1 = r1[key], rv2 = r2[key], lv = value;
+					result += std::to_string(lv + rv1 + rv2);
+
+					}, [&](auto key, auto object, auto index) {
+						add_key(key);
+
+						auto ro1 = r1(key);
+						auto ro2 = r2(key);
+
+						if (ro1.Valid() || ro2.Valid())
+							object._Accumulate2(r1,r2, result);
+						else
+							result += object.Json();
+					});
+
+				r1.ForEach([&](auto key, auto value, auto index) {
+					if (key == "_vmt" || key == "_bmt" || key == "_cmt")
+						return;
+
+					auto lvalue = Find(key);
+
+					if (!lvalue.size())
+					{
+						add_key(key);
+						add_value(value);
+					}
+					}, [&](auto key, auto object, auto index) {
+						auto lobject = (*this)(key);
+
+						if (!lobject.Valid())
+						{
+							add_key(key);
+							result += object.Json();
+						}
+					});
+
+				r2.ForEach([&](auto key, auto value, auto index) {
 					if (key == "_vmt" || key == "_bmt" || key == "_cmt")
 						return;
 

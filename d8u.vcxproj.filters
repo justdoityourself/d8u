@@ -1256,6 +1256,12 @@
     <ClInclude Include="d8u\time_series.hpp">
       <Filter>d8u</Filter>
     </ClInclude>
+    <ClInclude Include="d8u\compression.hpp">
+      <Filter>d8u</Filter>
+    </ClInclude>
+    <ClInclude Include="d8u\bloom.hpp">
+      <Filter>d8u</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />
