@@ -1210,7 +1210,7 @@ namespace d8u
 				result += (isObject()) ? "}" : "]";
 			}
 
-			template< typename R > void _Compare(const R& right, std::pair<unsigned,unsigned> & result)
+			template< typename R > void _Compare(const R& right, std::pair<unsigned,unsigned> & result) const
 			{
 				ForEach([&](auto key, auto value, auto index) 
 				{

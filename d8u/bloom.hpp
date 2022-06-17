@@ -22,6 +22,8 @@ namespace d8u
 		}
 	public:
 
+		Bloom() { Reset(); }
+
 		void Reset()
 		{
 			std::fill(std::array<uint8_t, byte_c>::begin(), std::array<uint8_t, byte_c>::end(), 0);
@@ -62,15 +64,17 @@ namespace d8u
 	template <size_t byte_c, typename hash_t = uint16_t, size_t hash_max_c = 0> class UniqueTally : public Bloom< byte_c, hash_t, hash_max_c>
 	{
 		size_t tally = 0;
+		size_t queries = 0;
 	public:
 		void Reset()
 		{
-			Bloom< byte_c, hash_t>::Reset();
+			Bloom< byte_c, hash_t, hash_max_c>::Reset();
 			tally = 0;
 		}
 
 		template < typename T> void Tally(const T& t)
 		{
+			queries++;
 			if (Bloom< byte_c, hash_t, hash_max_c>::Test(t))
 				return;
 
@@ -83,16 +87,22 @@ namespace d8u
 			return tally;
 		}
 
+		size_t Queries()
+		{
+			return queries;
+		}
+
 		std::string b64()
 		{
 			return encode::base64(compress(*this));
 		}
 
-		void b64(std::string_view v, size_t _tally=0)
+		void b64(std::string_view v, size_t _tally=0, size_t _queries=0)
 		{
 			auto bin = decompress(decode::base64(v));
 			copy(bin.begin(), bin.end(), Bloom< byte_c, hash_t, hash_max_c>::begin());
 			tally = _tally;
+			queries = _queries;
 		}
 	};
 }
