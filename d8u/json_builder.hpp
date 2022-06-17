@@ -137,7 +137,7 @@ namespace d8u
 
 		void Value(auto value)
 		{
-			//constexpr bool has_qr = requires(const decltype(value) & t) { t.TryQuoteWrapper(); };
+			constexpr bool has_qr = std::is_same<decltype(value), Memory>::value;
 			constexpr bool is_num = std::is_arithmetic_v<decltype(value)>;
 			constexpr bool has_size = requires(const decltype(value) & t) { t.size(); };
 
@@ -147,9 +147,12 @@ namespace d8u
 					return;
 			}
 
-			//if constexpr (has_qr) value.TryQuoteWrapper();
+			if constexpr (has_qr) {
+				value.TryQuoteWrapper();
+				data += std::string_view(value);
+			}
 
-			if constexpr (is_num) data += std::to_string(value);
+			else if constexpr (is_num) data += std::to_string(value);
 			else
 			{
 				if (value[0] != '{') data += "\"";
