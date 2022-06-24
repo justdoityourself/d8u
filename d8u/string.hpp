@@ -24,6 +24,41 @@ namespace d8u
 			return i;
 		}
 
+		template <size_t N> std::string_view split_at(const std::string_view target, std::string_view delimiter)
+		{
+			std::string_view result;
+			d8u::util::split(target, delimiter, [&](auto s, auto i) {
+				switch (i) {
+				case N: result = s;
+				default: return;
+				}
+			});
+
+			return result;
+		}
+
+		template <size_t ...N> auto split_n(const std::string_view target, std::string_view delimiter)
+		{
+			size_t pre = 0, i = 0,pos = 0;
+
+			auto next = [&](size_t n) {
+				for (; (pos = target.find(delimiter, pre)) != std::string_view::npos; i++, pre = pos + 1)
+				{
+					if (n == i)
+					{
+						auto result = target.substr(pre, pos - pre);
+						return i++, pre = pos + 1, result;
+					}
+				}
+
+				return target.substr(pre, pos - pre);
+			};
+
+			return std::make_tuple(next(N)...);
+		}
+
+
+
 		auto split_pair(const std::string_view target, std::string_view delimiter)
 		{
 			size_t del = target.find(delimiter);

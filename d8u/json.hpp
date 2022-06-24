@@ -1454,7 +1454,7 @@ namespace d8u
 
 		//typedef JsonReaderAny JsonReader;
 
-		auto WithJson(auto json, auto f)
+		auto WithJson(const auto &json, auto f)
 		{
 			JsonReader index(json);
 
