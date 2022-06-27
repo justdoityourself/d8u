@@ -27,7 +27,7 @@ namespace d8u
 		using std::array;
 		using std::vector;
 
-		void gzip_compress(d8u::sse_vector& m, int level = 5)
+		inline void gzip_compress(d8u::sse_vector& m, int level = 5)
 		{
 			CryptoPP::Gzip zipper(nullptr,level);
 			zipper.Put((CryptoPP::byte*)m.data(), m.size());
@@ -80,7 +80,7 @@ namespace d8u
 			return r;
 		}
 
-		void gzip_decompress(d8u::sse_vector& m)
+		inline void gzip_decompress(d8u::sse_vector& m)
 		{
 			uint32_t fin_l = *(uint32_t*)(m.data() + m.size() - sizeof(uint32_t));
 			fin_l &= 0x00ffffff;
@@ -126,7 +126,7 @@ namespace d8u
 			~MiniLZO() {}
 		};
 
-		void minilzo_decompress(d8u::sse_vector& m)
+		inline void minilzo_decompress(d8u::sse_vector& m)
 		{
 			static MiniLZO Context;
 
@@ -148,7 +148,7 @@ namespace d8u
 			m = std::move(result);
 		}
 
-		void minilzo_compress(d8u::sse_vector& m, int level = 5)
+		inline void minilzo_compress(d8u::sse_vector& m, int level = 5)
 		{
 			static MiniLZO Context;
 
@@ -200,7 +200,7 @@ namespace d8u
 			return result;
 		}
 		
-		void lzma_compress(d8u::sse_vector & m, int level = 5)
+		inline void lzma_compress(d8u::sse_vector & m, int level = 5)
 		{
 			std::array<uint8_t, LZMA_PROPS_SIZE> props;
 			size_t prop = LZMA_PROPS_SIZE;
@@ -247,7 +247,7 @@ namespace d8u
 			return result;
 		}
 
-		void lzma_decompress(d8u::sse_vector& m)
+		inline void lzma_decompress(d8u::sse_vector& m)
 		{
 			std::array<uint8_t, LZMA_PROPS_SIZE> props = { 93,0,16,0,0 };
 
@@ -270,7 +270,7 @@ namespace d8u
 			m = std::move(result);
 		}
 
-		void compress(d8u::sse_vector& m, int _level = 5)
+		inline void compress(d8u::sse_vector& m, int _level = 5)
 		{
 			auto algorithm = _level / 10;
 			auto level = _level % 10;
@@ -287,7 +287,7 @@ namespace d8u
 			}
 		}
 
-		void decompress(d8u::sse_vector& m)
+		inline void decompress(d8u::sse_vector& m)
 		{
 			uint32_t fin_l = *(uint32_t*)(m.data() + m.size() - sizeof(uint32_t));
 

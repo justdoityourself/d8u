@@ -123,6 +123,7 @@ namespace d8u
 							function(TypeArray, context);
 
 							context.Clear(false);
+							continue;
 						} break;
 					case ']': break;
 					case ',':

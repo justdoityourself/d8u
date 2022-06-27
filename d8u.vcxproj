@@ -149,6 +149,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Benchmark|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>..\common\libtomcrypt\src\headers;..\common\libtommath;../template_crypto;../common/minilzo-2.10;../common/cryptopp8.2;../common/LZMA19.00;../common/zopfli;$(IncludePath)</IncludePath>
+    <LibraryPath>../common/cryptopp8.2\CryptoPP\x64\Output\Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -270,16 +272,20 @@
       <WarningLevel>Level3</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>BENCHMARK_RUNNER;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>false</SDLCheck>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;LTM_DESC;D8U_LTC;BENCHMARK_RUNNER;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>cryptlib.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)$(CoreLibraryDependencies);</AdditionalDependencies>
+      <StackReserveSize>33554432</StackReserveSize>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -764,6 +770,7 @@
     <ClInclude Include="d8u\init.hpp" />
     <ClInclude Include="d8u\json.hpp" />
     <ClInclude Include="d8u\json_builder.hpp" />
+    <ClInclude Include="d8u\json_stack.hpp" />
     <ClInclude Include="d8u\ltc.hpp" />
     <ClInclude Include="d8u\ltc_crypto.hpp" />
     <ClInclude Include="d8u\ltc_hash.hpp" />

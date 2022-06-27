@@ -64,7 +64,7 @@ namespace d8u
 
 	namespace util
 	{
-		void ClearScreen()
+		inline void ClearScreen()
 		{
 #ifdef WIN32
 
@@ -106,19 +106,19 @@ namespace d8u
 			~dec_scope() { t--; }
 		};
 
-		void fast_until(std::atomic<size_t>& A, size_t M = 1)
+		inline void fast_until(std::atomic<size_t>& A, size_t M = 1)
 		{
 			while (A.load() != M)
 				std::this_thread::sleep_for(std::chrono::milliseconds(10));
 		}
 
-		void fast_wait(std::atomic<size_t> & A, size_t M=1)
+		inline void fast_wait(std::atomic<size_t> & A, size_t M=1)
 		{
 			while (A.load() >= M)
 				std::this_thread::sleep_for(std::chrono::milliseconds(10));
 		}
 
-		void fast_wait_inc(std::atomic<size_t>& A, size_t M = 1)
+		inline void fast_wait_inc(std::atomic<size_t>& A, size_t M = 1)
 		{
 			while (A.load() >= M)
 				std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -126,13 +126,13 @@ namespace d8u
 			A++; // yes there is a race condition here, this function is not intended to prevent a race.
 		}
 
-		void slow_wait(std::atomic<size_t>& A, size_t M=1)
+		inline void slow_wait(std::atomic<size_t>& A, size_t M=1)
 		{
 			while (A.load() >= M)
 				std::this_thread::sleep_for(std::chrono::milliseconds(100));
 		}
 
-		void empty_file(const string_view file)
+		inline void empty_file(const string_view file)
 		{
 			ofstream fs(file.data(), ios::out);
 		}
@@ -147,7 +147,7 @@ namespace d8u
 			return result;
 		}
 
-		void empty_file1(const string_view file)
+		inline void empty_file1(const string_view file)
 		{
 			ofstream fout;
 			fout.open(file.data(), ios::out);
@@ -159,7 +159,7 @@ namespace d8u
 #include <sys/stat.h>
 #endif
 
-		uint64_t GetFileSize(std::string_view name)
+		inline uint64_t GetFileSize(std::string_view name)
 		{
 			uint64_t size = 0;
 			
@@ -188,7 +188,7 @@ namespace d8u
 			return size;
 		}
 
-		std::time_t GetFileWriteTime(const std::filesystem::path& filename)
+		inline std::time_t GetFileWriteTime(const std::filesystem::path& filename)
 		{
 #if defined ( _WIN32 )
 			{
@@ -225,7 +225,7 @@ namespace d8u
 #endif
 		}
 
-		std::time_t GetFileWriteTime2(const std::string & filename)
+		inline std::time_t GetFileWriteTime2(const std::string & filename)
 		{
 #if defined ( _WIN32 )
 			{
@@ -261,7 +261,7 @@ namespace d8u
 #endif
 		}
 
-		void string_as_file(string_view file, string_view data)
+		inline void string_as_file(string_view file, string_view data)
 		{
 			filesystem::remove(file);
 
@@ -270,7 +270,7 @@ namespace d8u
 		}
 
 		typedef array<uint8_t, 32> file_id;
-		void id_file(string_view name, file_id& hash)
+		inline void id_file(string_view name, file_id& hash)
 		{
 			mio::mmap_source file(name);
 			//CryptoPP::SHA256().CalculateDigest(hash.data(), (const CryptoPP::byte*) file.data(), file.size());
@@ -434,7 +434,7 @@ namespace d8u
 
 		constexpr std::array<uint8_t, 32> default_domain = { 0xC5,0x22,0xAC,0xAD,0x91,0xDD,0x42,0xC6,0x90,0xC8,0xEE,0x60,0x82,0x0B,0x18,0x79,0x8F,0xB4,0x39,0xE9,0x24,0x00,0x48,0xC4,0xB1,0xC9,0x7B,0xC3,0xB0,0xA6,0x66,0xA3 };
 
-		string now()
+		inline string now()
 		{
 			chrono::system_clock::time_point p = chrono::system_clock::now();
 			time_t t = chrono::system_clock::to_time_t(p);
@@ -442,12 +442,12 @@ namespace d8u
 			return to_string((uint64_t)t);
 		}
 
-		auto now_s(std::string_view s) 
+		inline auto now_s(std::string_view s)
 		{
 			return std::stol(std::string(s));
 		}
 
-		auto now_n()
+		inline auto now_n()
 		{
 			chrono::system_clock::time_point p = chrono::system_clock::now();
 			time_t t = chrono::system_clock::to_time_t(p);
@@ -511,7 +511,7 @@ namespace d8u
 		constexpr size_t _kb(size_t s) { return s * 1024; }
 		constexpr size_t _gb(size_t s) { return s * 1024 * 1024 * 1024; }
 
-		array<uint8_t, 16> unique_id()
+		inline array<uint8_t, 16> unique_id()
 		{
 #ifdef _WIN32
 			array<uint8_t, 16> ret;

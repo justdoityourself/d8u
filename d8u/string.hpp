@@ -59,7 +59,7 @@ namespace d8u
 
 
 
-		auto split_pair(const std::string_view target, std::string_view delimiter)
+		inline auto split_pair(const std::string_view target, std::string_view delimiter)
 		{
 			size_t del = target.find(delimiter);
 
@@ -95,7 +95,7 @@ namespace d8u
 			return s;
 		}
 
-		std::vector<uint8_t> to_bin(std::string_view v)
+		inline std::vector<uint8_t> to_bin(std::string_view v)
 		{
 			std::vector<uint8_t> result; result.reserve(v.size() / 2 + 1);
 			auto ctoi = [](char c)
@@ -116,7 +116,7 @@ namespace d8u
 			return result;
 		}
 
-		sse_vector to_bin_sse(std::string_view v)
+		inline sse_vector to_bin_sse(std::string_view v)
 		{
 			sse_vector result; result.reserve(v.size() / 2 + 1);
 			auto ctoi = [](char c)
@@ -150,7 +150,7 @@ namespace d8u
 			return result;
 		}
 
-		std::wstring to_wide(std::string_view s)
+		inline std::wstring to_wide(std::string_view s)
 		{
 			//This Method, is so slow and uses thread locks
 			//std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
@@ -160,7 +160,7 @@ namespace d8u
 			return std::wstring(s.begin(), s.end());
 		}
 
-		std::string to_narrow(std::wstring_view s)
+		inline std::string to_narrow(std::wstring_view s)
 		{
 			//This Method, is so slow and uses thread locks
 			//std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
