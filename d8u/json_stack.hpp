@@ -1,3 +1,5 @@
+/* Copyright (C) 2020 D8DATAWORKS - All Rights Reserved */
+
 #pragma once
 
 namespace d8u
@@ -485,9 +487,21 @@ namespace d8u
 		return result;
 	}
 
+	auto JsonSelectOne(const auto& j, auto one)
+	{
+		auto arr = ArraySelect(j, one);
+		return arr[0];
+	}
+
 	auto JsonSelect(const auto& j, auto ... args_t)
 	{
 		return std::tuple_cat(ArraySelect(j,args_t...));
+	}
+
+	auto JsonPathOne(const auto& j, auto one)
+	{
+		auto arr = ArrayPath(j, one);
+		return arr[0];
 	}
 
 	auto JsonPath(const auto& j, auto ... args_t)
@@ -495,29 +509,32 @@ namespace d8u
 		return std::tuple_cat(ArrayPath(j, args_t...));
 	}
 
+	template <typename T> auto _Convert(const auto& a)
+	{
+		if (!a.size())
+			return T();
+
+		if constexpr (std::is_same_v<T, bool>)
+			return (a == "true" || a == "1") ? true : false;
+		else if constexpr (std::is_same_v<T, std::string_view>)
+			return a;
+		else if constexpr (std::is_same_v<T, std::string>)
+			return std::string(a);
+		else if constexpr (std::is_same_v<T, int64_t>)
+			return std::stoll(a.data());
+		else if constexpr (std::is_same_v<T, int>)
+			return std::stoi(a.data());
+		else if constexpr (std::is_same_v<T, float>)
+			return std::stof(a.data());
+		else if constexpr (std::is_same_v<T, double>)
+			return std::stod(a.data());
+	}
+
 	template<typename ...types_t> auto TypeBase(const auto& arr)
 	{
 		size_t i = arr.size();
 
-		auto convert = [&]<typename T>(T t) -> T
-		{
-			auto a = arr[--i];
-			if (!a.size())
-				return T();
-
-			if constexpr (std::is_same_v<T, bool>)
-				return a == "true" ? true : false;
-			else if constexpr (std::is_same_v<T, std::string_view>)
-				return a;
-			else if constexpr (std::is_same_v<T, int64_t>)
-				return std::stoll(a.data());
-			else if constexpr (std::is_same_v<T, int>)
-				return std::stoi(a.data());
-			else if constexpr (std::is_same_v<T, float>)
-				return std::stof(a.data());
-			else if constexpr (std::is_same_v<T, double>)
-				return std::stod(a.data());
-		};
+		auto convert = [&]<typename T>(T t) { return _Convert<T>(arr[--i]); };
 
 		return std::make_tuple(convert(types_t()) ...);
 	}
@@ -530,6 +547,16 @@ namespace d8u
 	template<typename ...types_t> auto TypePath(const auto& j, auto ... args_t)
 	{
 		return TypeBase<types_t...>(ArrayPath(j, args_t...));
+	}
+
+	template<typename T> auto TypeSelectOne(const auto& j, auto one)
+	{
+		return _Convert<T>(JsonSelectOne(j, one));
+	}
+
+	template<typename T> auto TypePathOne(const auto& j, auto one)
+	{
+		return _Convert<T>(JsonPathOne(j, one));
 	}
 
 	template<size_t depth_c=64, size_t map_c=256, typename int_t=uint32_t, typename hash_t = FastHash, bool simple = true> class JsonFixedRng
