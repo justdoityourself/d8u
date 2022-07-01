@@ -204,7 +204,7 @@
     <ClCompile Include="..\common\zopfli\zopfli\zopfli_lib.c">
       <Filter>Source Files\zopfli</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\minilzo-2.10\minilzo\minilzo.c">
+    <ClCompile Include="..\common\minilzo\minilzo.c">
       <Filter>Source Files\minilzo</Filter>
     </ClCompile>
     <ClCompile Include="..\common\libtomcrypt\src\ciphers\aes\aes.c">
@@ -1205,13 +1205,13 @@
     <ClInclude Include="appi.hpp">
       <Filter>d8u</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\minilzo-2.10\minilzo\lzoconf.h">
+    <ClInclude Include="..\common\minilzo\lzoconf.h">
       <Filter>Source Files\minilzo</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\minilzo-2.10\minilzo\lzodefs.h">
+    <ClInclude Include="..\common\minilzo\lzodefs.h">
       <Filter>Source Files\minilzo</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\minilzo-2.10\minilzo\minilzo.h">
+    <ClInclude Include="..\common\minilzo\minilzo.h">
       <Filter>Source Files\minilzo</Filter>
     </ClInclude>
     <ClInclude Include="d8u\ltc.hpp">
@@ -1268,13 +1268,13 @@
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />
-    <None Include="..\common\minilzo-2.10\minilzo\COPYING">
+    <None Include="..\common\minilzo\COPYING">
       <Filter>Source Files\minilzo</Filter>
     </None>
-    <None Include="..\common\minilzo-2.10\minilzo\Makefile">
+    <None Include="..\common\minilzo\Makefile">
       <Filter>Source Files\minilzo</Filter>
     </None>
-    <None Include="..\common\minilzo-2.10\minilzo\README.LZO">
+    <None Include="..\common\minilzo\README.LZO">
       <Filter>Source Files\minilzo</Filter>
     </None>
   </ItemGroup>

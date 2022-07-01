@@ -135,7 +135,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Test|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>..\common\libtomcrypt\src\headers;..\common\libtommath;../template_crypto;../common/minilzo-2.10;../common/cryptopp8.2;../common/LZMA19.00;../common/zopfli;$(IncludePath)</IncludePath>
+    <IncludePath>..\common\libtomcrypt\src\headers;..\common\libtommath;../template_crypto;../common;../common/cryptopp8.2;../common/LZMA19.00;../common/zopfli;$(IncludePath)</IncludePath>
     <LibraryPath>../common/cryptopp8.2\CryptoPP\x64\Output\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -149,7 +149,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Benchmark|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>..\common\libtomcrypt\src\headers;..\common\libtommath;../template_crypto;../common/minilzo-2.10;../common/cryptopp8.2;../common/LZMA19.00;../common/zopfli;$(IncludePath)</IncludePath>
+    <IncludePath>..\common\libtomcrypt\src\headers;..\common\libtommath;../template_crypto;../common;../common/cryptopp8.2;../common/LZMA19.00;../common/zopfli;$(IncludePath)</IncludePath>
     <LibraryPath>../common/cryptopp8.2\CryptoPP\x64\Output\Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -437,7 +437,7 @@
     <ClCompile Include="..\common\LZMA19.00\LZMA\XzIn.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">false</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="..\common\minilzo-2.10\minilzo\minilzo.c" />
+    <ClCompile Include="..\common\minilzo\minilzo.c" />
     <ClCompile Include="..\common\zopfli\zopfli\blocksplitter.c" />
     <ClCompile Include="..\common\zopfli\zopfli\cache.c" />
     <ClCompile Include="..\common\zopfli\zopfli\deflate.c" />
@@ -736,9 +736,9 @@
     <ClCompile Include="..\common\libtommath\s_mp_zero_digs.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\common\minilzo-2.10\minilzo\lzoconf.h" />
-    <ClInclude Include="..\common\minilzo-2.10\minilzo\lzodefs.h" />
-    <ClInclude Include="..\common\minilzo-2.10\minilzo\minilzo.h" />
+    <ClInclude Include="..\common\minilzo\lzoconf.h" />
+    <ClInclude Include="..\common\minilzo\lzodefs.h" />
+    <ClInclude Include="..\common\minilzo\minilzo.h" />
     <ClInclude Include="..\common\zopfli\zopfli\blocksplitter.h" />
     <ClInclude Include="..\common\zopfli\zopfli\cache.h" />
     <ClInclude Include="..\common\zopfli\zopfli\deflate.h" />
@@ -792,9 +792,9 @@
     <ClInclude Include="gsl-lite.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\common\minilzo-2.10\minilzo\COPYING" />
-    <None Include="..\common\minilzo-2.10\minilzo\Makefile" />
-    <None Include="..\common\minilzo-2.10\minilzo\README.LZO" />
+    <None Include="..\common\minilzo\COPYING" />
+    <None Include="..\common\minilzo\Makefile" />
+    <None Include="..\common\minilzo\README.LZO" />
     <None Include=".gitignore" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
