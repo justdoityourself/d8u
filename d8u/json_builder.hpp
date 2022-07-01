@@ -112,8 +112,23 @@ namespace d8u
 			started[depth] = false;
 		}
 
+		void Array() {
+			data += "[";
+			depth++;
+
+			if (depth >= 12)
+				throw "Exceeded Max Json Depth";
+
+			started[depth] = false;
+		}
+
 		void Close() {
 			data += "}";
+			depth--;
+		}
+
+		void CloseArray() {
+			data += "]";
 			depth--;
 		}
 
@@ -133,6 +148,24 @@ namespace d8u
 		{
 			Key(key);
 			Open();
+		}
+
+		void KA(auto key)
+		{
+			Key(key);
+			Array();
+		}
+
+		void AS(auto value)
+		{
+			if (started[depth])
+				data += ",";
+			else
+				started[depth] = true;
+
+			data += "\"";
+			data += std::string_view(value);
+			data += "\":";
 		}
 
 		void Value(auto value)

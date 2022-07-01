@@ -522,6 +522,8 @@ namespace d8u
 			return std::string(a);
 		else if constexpr (std::is_same_v<T, int64_t>)
 			return std::stoll(a.data());
+		else if constexpr (std::is_same_v<T, uint64_t>)
+			return std::stoull(a.data());
 		else if constexpr (std::is_same_v<T, int>)
 			return std::stoi(a.data());
 		else if constexpr (std::is_same_v<T, float>)
