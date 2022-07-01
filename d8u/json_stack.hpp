@@ -509,7 +509,7 @@ namespace d8u
 		return std::tuple_cat(ArrayPath(j, args_t...));
 	}
 
-	template <typename T> auto _Convert(const auto& a)
+	template <typename T> T _Convert(const auto& a)
 	{
 		if (!a.size())
 			return T();
