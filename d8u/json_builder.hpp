@@ -299,5 +299,26 @@ namespace d8u
 
 		std::string data;
 	};
+
+	#define KVS std::make_pair
+	#define KVD(__K) KVS(#__K,__K)
+
+	std::string JsonKVS(auto ... args_t)
+	{
+		JsonPiecemeal json(1024);
+
+		json.Open();
+
+		auto handler = [&](const auto& kvpair)
+		{
+			json.KV(kvpair.first, kvpair.second);
+		};
+
+		(handler(args_t), ...);
+
+		json.Close();
+
+		return json.Claim();
+	}
 }
 
