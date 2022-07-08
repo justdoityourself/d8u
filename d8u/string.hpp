@@ -51,7 +51,8 @@ namespace d8u
 					}
 				}
 
-				return target.substr(pre, pos - pre);
+				auto result = target.substr(pre, pos - pre);
+				return i++, pre = pos + 1, result;
 			};
 
 			return std::make_tuple(next(N)...);
