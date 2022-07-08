@@ -301,9 +301,10 @@ namespace d8u
 	};
 
 	#define KVS std::make_pair
+	#define KVO(__K,...) KVS(__K,JsonKVS(__VA_ARGS__))
 	#define KVD(__K) KVS(#__K,__K)
 
-	std::string JsonKVS(auto ... args_t)
+	std::string JsonKVS(auto &&... args_t)
 	{
 		JsonPiecemeal json(1024);
 
