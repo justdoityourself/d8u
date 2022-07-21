@@ -177,7 +177,10 @@ namespace d8u
 			if constexpr (has_size)
 			{
 				if (!value.size())
+				{
+					data += "\"\"";
 					return;
+				}
 			}
 
 			if constexpr (has_qr) {

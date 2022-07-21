@@ -55,7 +55,7 @@ namespace d8u
 				return i++, pre = pos + 1, result;
 			};
 
-			return std::make_tuple(next(N)...);
+			return std::tuple{ next(N)... };
 		}
 
 

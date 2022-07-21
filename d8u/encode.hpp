@@ -148,9 +148,9 @@ namespace d8u
 			return out;
 		}
 
-		inline std::vector<uint8_t> url(const std::string_view in)
+		template<typename R> R url_t2(const std::string_view in)
 		{
-			std::vector<uint8_t> out;
+			R out;
 			out.reserve(in.size() * 3 / 4 + 4);
 
 			std::array<int, 256> T;
@@ -174,6 +174,16 @@ namespace d8u
 				}
 			}
 			return out;
+		}
+
+		inline auto url_s(const std::string_view in)
+		{
+			return url_t2< std::string >(in);
+		}
+
+		inline auto url(const std::string_view in)
+		{
+			return url_t2< std::vector<uint8_t> >(in);
 		}
 	}
 }

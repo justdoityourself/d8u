@@ -509,6 +509,20 @@ namespace d8u
 		return std::tuple_cat(ArrayPath(j, args_t...));
 	}
 
+	auto JsonSelectCopy(const auto& j, auto ... args_t)
+	{
+		auto r = d8u::JsonSelect(j, args_t...);
+
+		auto copy = [&]<std::size_t... I>(std::index_sequence<I...>) {
+			return std::make_tuple(std::string(std::get<I>(r))...);
+		};
+
+		return copy(std::make_index_sequence<sizeof...(args_t)>()); 
+	}
+
+//TODO this doesn't work because all #__VA_ARGS__ turns into one string instead of a list of strings
+//#define JsonMove(x,...) std::tie(__VA_ARGS__) = d8u::JsonSelectCopy(x,#__VA_ARGS__)
+
 	template <typename T> T _Convert(const auto& a)
 	{
 		if (!a.size())
@@ -534,11 +548,17 @@ namespace d8u
 
 	template<typename ...types_t> auto TypeBase(const auto& arr)
 	{
+#ifdef _MSC_VER
 		size_t i = arr.size();
 
 		auto convert = [&]<typename T>(T t) { return _Convert<T>(arr[--i]); };
+#else
+		size_t i = 0;
 
-		return std::make_tuple(convert(types_t()) ...);
+		auto convert = [&]<typename T>(T t) { return _Convert<T>(arr[i++]); };
+#endif
+
+		return std::tuple{ convert(types_t()) ... };
 	}
 
 	template<typename ...types_t> auto TypeSelect(const auto& j, auto ... args_t)
@@ -588,7 +608,7 @@ namespace d8u
 			size_t extension = 0;
 			size_t dx = 0;
 
-			while (extension < overflow)
+			while (extension <= overflow)
 			{
 				const auto& v = map[bucket + extension % map_c];
 				
@@ -611,12 +631,17 @@ namespace d8u
 			return std::make_tuple(Find(args_t)...);
 		}
 
+		template <typename type> auto FindT(std::string_view path)
+		{
+			return FindEachT<type>(path);
+		}
+
 		template <typename ... types_t> auto FindEachT(auto ... args_t)
 		{
 			std::array<std::string_view, sizeof...(types_t)> arr;
-			size_t i = 0;
+			size_t i = arr.size();
 
-			((arr[i++] = Find(args_t)), ...);
+			((arr[--i] = Find(args_t)), ...);
 
 			return TypeBase<types_t...>(arr);
 		}
@@ -628,7 +653,7 @@ namespace d8u
 
 		template <size_t N> auto FindEachN(auto ... args_t)
 		{
-			return std::make_tuple(FindN<N>(args_t)...);
+			return std::tuple{ FindN<N>(args_t)... };
 		}
 
 		void FindAll(std::string_view path, auto f)
@@ -637,7 +662,7 @@ namespace d8u
 
 			size_t extension = 0;
 
-			while (extension < overflow)
+			while (extension <= overflow)
 			{
 				const auto& v = map[bucket + extension % map_c];
 				if (path == std::string_view(json.data() + v.key, v.key_length))
