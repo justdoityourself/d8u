@@ -1101,6 +1101,9 @@
     <ClCompile Include="..\common\libtomcrypt\src\modes\ctr\ctr_test.c">
       <Filter>Source Files\ltc</Filter>
     </ClCompile>
+    <ClCompile Include="simdjson.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="d8u\json.hpp">
@@ -1263,6 +1266,21 @@
       <Filter>d8u</Filter>
     </ClInclude>
     <ClInclude Include="d8u\json_stack.hpp">
+      <Filter>d8u</Filter>
+    </ClInclude>
+    <ClInclude Include="d8u\json_simd.hpp">
+      <Filter>d8u</Filter>
+    </ClInclude>
+    <ClInclude Include="d8u\bench_simd.hpp">
+      <Filter>d8u</Filter>
+    </ClInclude>
+    <ClInclude Include="d8u\bench_data.hpp">
+      <Filter>d8u</Filter>
+    </ClInclude>
+    <ClInclude Include="simdjson.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="d8u\file.hpp">
       <Filter>d8u</Filter>
     </ClInclude>
   </ItemGroup>

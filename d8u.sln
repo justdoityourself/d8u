@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29709.97
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32616.157
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "d8u", "d8u.vcxproj", "{132FBCCA-E9FB-4435-81A7-B8C75FECD7D6}"
 EndProject
@@ -9,6 +9,8 @@ Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Benchmark|x64 = Benchmark|x64
 		Benchmark|x86 = Benchmark|x86
+		BenchSimd|x64 = BenchSimd|x64
+		BenchSimd|x86 = BenchSimd|x86
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
 		Release|x64 = Release|x64
@@ -21,6 +23,10 @@ Global
 		{132FBCCA-E9FB-4435-81A7-B8C75FECD7D6}.Benchmark|x64.Build.0 = Benchmark|x64
 		{132FBCCA-E9FB-4435-81A7-B8C75FECD7D6}.Benchmark|x86.ActiveCfg = Benchmark|Win32
 		{132FBCCA-E9FB-4435-81A7-B8C75FECD7D6}.Benchmark|x86.Build.0 = Benchmark|Win32
+		{132FBCCA-E9FB-4435-81A7-B8C75FECD7D6}.BenchSimd|x64.ActiveCfg = BenchSimd|x64
+		{132FBCCA-E9FB-4435-81A7-B8C75FECD7D6}.BenchSimd|x64.Build.0 = BenchSimd|x64
+		{132FBCCA-E9FB-4435-81A7-B8C75FECD7D6}.BenchSimd|x86.ActiveCfg = BenchSimd|Win32
+		{132FBCCA-E9FB-4435-81A7-B8C75FECD7D6}.BenchSimd|x86.Build.0 = BenchSimd|Win32
 		{132FBCCA-E9FB-4435-81A7-B8C75FECD7D6}.Debug|x64.ActiveCfg = Debug|x64
 		{132FBCCA-E9FB-4435-81A7-B8C75FECD7D6}.Debug|x64.Build.0 = Debug|x64
 		{132FBCCA-E9FB-4435-81A7-B8C75FECD7D6}.Debug|x86.ActiveCfg = Debug|Win32

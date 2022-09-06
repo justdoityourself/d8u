@@ -24,6 +24,21 @@ namespace d8u
 			return i;
 		}
 
+		template < typename F > size_t split_a(const std::string_view target, std::string_view delimiter, F f)
+		{
+			size_t pre = 0, i = 0;
+
+			for (size_t pos = 0; (pos = target.find(delimiter, pre)) != std::string_view::npos; i++, pre = pos + 1)
+			{
+				if (f(target.substr(pre, pos - pre), i))
+					return i;
+			}
+
+			if (pre) f(target.substr(pre, target.size() - pre), i);
+
+			return i;
+		}
+
 		template <size_t N> std::string_view split_at(const std::string_view target, std::string_view delimiter)
 		{
 			std::string_view result;

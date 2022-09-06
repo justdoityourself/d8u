@@ -1,9 +1,50 @@
-/* Copyright (C) 2020 D8DATAWORKS - All Rights Reserved */
+/* Copyright (C) 2022 D8DATAWORKS - All Rights Reserved */
 
 #pragma once
 
 namespace d8u
 {
+	size_t JsonObjectParse(std::string_view json,size_t depth=0)
+	{
+		const char* itr = json.data();
+		//const char* start;
+		const char* end = itr+json.size();
+
+		for (; itr < end; itr++)
+		{
+			switch (*itr)
+			{
+			case '\"':
+				itr++;
+
+				//start = itr;
+				while (*itr != '"' && itr < end)
+					itr++;
+
+				//if (*start == ':' && *(start + 1) == ' ')
+				//	std::cout << "HERE";
+
+				//std::cout << std::string_view(start, itr) << std::endl;
+
+				break;
+			case '{':
+				depth++;
+
+				break;
+
+			case '}':
+				depth--;
+
+				if (!depth)
+					return ++itr-json.data();
+
+				break;
+			}
+		}
+
+		return json.size();
+	}
+
 	enum StackTypes : uint8_t
 	{
 		TypeObject,
@@ -127,10 +168,25 @@ namespace d8u
 		}
 	};
 
-	template <typename int_t = int32_t, size_t depth_c = 64> bool StreamJsonNoRecursion2(std::string_view json, auto cb)
+	enum class StreamActions2
+	{
+		Continue,
+		Break,
+		SkipObject
+	};
+
+#define ActionHandler2() \
+if constexpr (action_e) {switch(action){\
+case StreamActions2::Continue: break;\
+case StreamActions2::Break: return false; break;\
+case StreamActions2::SkipObject: itr += JsonObjectParse(std::string_view(itr,end)); break;\
+}}
+
+	template <typename int_t = int32_t, size_t depth_c = 64, bool action_e=false> bool StreamJsonNoRecursion2(std::string_view json, auto cb)
 	{
 		int_t key_dx = 0;
 		int_t key_len = 0;
+		StreamActions2 action;
 
 		const char* start = nullptr;
 		bool inside_string = false;
@@ -140,33 +196,11 @@ namespace d8u
 		StackTypes stack[depth_c];
 
 		const char* itr = json.data();
+		const char* end = itr + json.size();
+
 		const char* root = itr;
-		for (size_t i = 0; i < json.size();i++,itr++)
+		for (; itr < end;itr++)
 		{
-			if (inside_string)
-			{
-				while (*itr != '"' && i < json.size())
-					i++, itr++;
-
-				if (key_dx)
-				{
-					if (!cb(JsonStreamRecord2< int_t>{ current_type, TypeString, key_dx, key_len, (int_t)(start - root), (int_t)(itr - start) }, depth))
-						return false;
-					key_dx = 0, key_len = 0, start = nullptr;
-				}
-				else if (current_type == TypeArray)
-				{
-					if (!cb(JsonStreamRecord2< int_t>{ current_type, TypeString, 0, 0, (int_t)(start - root), (int_t)(itr - start) }, depth))
-						return false;
-					start = nullptr;
-				}
-				else
-					key_dx = (int_t)(start - root), key_len = (int_t)(itr - start), start = nullptr;
-
-				inside_string = false;
-				continue;
-			}
-
 			if (current_type == TypeUndetermined && *itr != '{')
 				continue;
 
@@ -174,15 +208,39 @@ namespace d8u
 			{
 			case ':': case ' ': case '\t': case '\n': case '\r': break;
 			case '\"':
-				start = itr + 1;
-				inside_string = true;
+				start = ++itr;
+				
+				while (*itr != '"' && itr < end)
+					itr++;
+
+				if (key_dx)
+				{
+					action = cb(JsonStreamRecord2< int_t>{ current_type, TypeString, key_dx, key_len, (int_t)(start - root), (int_t)(itr - start) }, depth);
+
+					ActionHandler2();
+
+					key_dx = 0, key_len = 0, start = nullptr;
+				}
+				else if (current_type == TypeArray)
+				{
+					action = cb(JsonStreamRecord2< int_t>{ current_type, TypeString, 0, 0, (int_t)(start - root), (int_t)(itr - start) }, depth);
+
+					ActionHandler2();
+						
+					start = nullptr;
+				}
+				else
+					key_dx = (int_t)(start - root), key_len = (int_t)(itr - start), start = nullptr;
+
 				break;
 			case '{':
 				if (depth == depth_c)
 					return false;
 
-				if(!cb(JsonStreamRecord2< int_t>{ current_type, TypeObject, key_dx, key_len, 0, 0 }, depth))
-					return false;
+				action = cb(JsonStreamRecord2< int_t>{ current_type, TypeObject, key_dx, key_len, (int_t)(itr - start), 0 }, depth);
+
+				ActionHandler2();
+
 				key_dx = 0, key_len = 0, start = nullptr;
 				stack[++depth] = current_type = TypeObject;
 
@@ -193,16 +251,20 @@ namespace d8u
 
 				if (start)
 				{
-					if (!cb(JsonStreamRecord2< int_t>{ current_type, TypeUndetermined, key_dx, key_len, (int_t)(start - root), (int_t)(itr - start) }, depth))
-						return false;
+					action = cb(JsonStreamRecord2< int_t>{ current_type, TypeUndetermined, key_dx, key_len, (int_t)(start - root), (int_t)(itr - start) }, depth);
+
+					ActionHandler2();
+
 					key_dx = 0, key_len = 0, start = nullptr;
 				}
 					
 				if (depth == -1)
 					return false;
 
-				if (!cb(JsonStreamRecord2< int_t>{ current_type, TypeClose, 0, 0, 0, 0 }, depth))
-					return false;
+				action = cb(JsonStreamRecord2< int_t>{ current_type, TypeClose, 0, 0, (int_t)(itr - start), 0 }, depth);
+
+				ActionHandler2();
+
 				key_dx = 0, key_len = 0, start = nullptr;
 				current_type = stack[--depth];
 
@@ -212,8 +274,10 @@ namespace d8u
 				if (depth == depth_c)
 					return false;
 
-				if (!cb(JsonStreamRecord2< int_t>{ current_type, TypeArray, key_dx, key_len, 0, 0 }, depth))
-					return false;
+				action = cb(JsonStreamRecord2< int_t>{ current_type, TypeArray, key_dx, key_len, 0, 0 }, depth);
+
+				ActionHandler2();
+
 				key_dx = 0, key_len = 0, start = nullptr;
 				stack[++depth] = current_type = TypeArray;
 
@@ -222,8 +286,10 @@ namespace d8u
 			case ',':
 				if (start)
 				{
-					if (!cb(JsonStreamRecord2< int_t>{ current_type, TypeUndetermined, key_dx, key_len, (int_t)(start - root), (int_t)(itr - start) }, depth))
-						return false;
+					action = cb(JsonStreamRecord2< int_t>{ current_type, TypeUndetermined, key_dx, key_len, (int_t)(start - root), (int_t)(itr - start) }, depth);
+
+					ActionHandler2();
+
 					key_dx = 0, key_len = 0, start = nullptr;
 				}
 				break;
@@ -290,7 +356,7 @@ namespace d8u
 
 				sequence[index++] = v;
 
-				return true;
+				return StreamActions2::Continue;
 			});
 		}
 
@@ -311,13 +377,28 @@ namespace d8u
 				sequence[index++] = v;
 				f(v);
 
-				return true;
+				return StreamActions2::Continue;
 			});
 		}
 
 	private:
 		size_t index;
 		std::array< JsonStreamRecord2<int_t>, max_c> sequence;
+	};
+
+	class JsonCountControl
+	{
+	public:
+		JsonCountControl() {}
+		JsonCountControl(const auto& j) { Init(j); }
+
+		bool Init(const auto& j) {
+			return StreamJsonNoRecursion(j, [&](auto cur, auto type, auto k, auto v) {
+				count++;
+			});
+		}
+
+		size_t count = 0;
 	};
 
 	class JsonSeq
@@ -367,7 +448,7 @@ namespace d8u
 		void Run(std::string_view v)
 		{
 			for (const auto& c : v)
-				hash ^= c * 882319;
+				hash ^= 882319 * c;
 		}
 
 		size_t operator % (size_t lim)
@@ -378,6 +459,36 @@ namespace d8u
 		FastHash operator ^ (const FastHash& r)
 		{
 			return FastHash(hash ^ r.hash);
+		}
+	};
+
+	class DoubleHash
+	{
+		uint64_t hash = 0;
+	public:
+		DoubleHash() {}
+
+		DoubleHash(uint64_t _hash) : hash(_hash) {}
+
+		DoubleHash(std::string_view v)
+		{
+			Run(v);
+		}
+
+		void Run(std::string_view v)
+		{
+			for (const auto& c : v)
+				hash ^= 436327324831 * c;
+		}
+
+		size_t operator % (size_t lim)
+		{
+			return hash % lim;
+		}
+
+		DoubleHash operator ^ (const DoubleHash& r)
+		{
+			return DoubleHash(hash ^ r.hash);
 		}
 	};
 
@@ -399,32 +510,32 @@ namespace d8u
 
 		size_t current = 0;
 
-		StreamJsonNoRecursion2<int16_t>(j, [&](const auto& v, auto depth)
+		StreamJsonNoRecursion2<int16_t,64,true>(j, [&](const auto& v, auto depth)
 		{
 			if (current == total)
-				return false; // Todo short circuit iteration
+				return StreamActions2::Break; // Todo short circuit iteration
 
 			switch (v.type)
 			{
-			default: return true;
+			default: return StreamActions2::Continue;
 			case TypeString:
 			case TypeUndetermined:
 				if (size_t i = ___match_all(0, v.Key(j), args_t...); i != -1)
 					current++, result[i] = v.Value(j);
 
-				return true;
+				return StreamActions2::Continue;
 			}
 		});
 
 		return result;
 	}
 
-	template < typename int_t = int32_t, size_t depth_c = 64> auto StreamPath(const auto& j, auto f)
+	template < typename int_t = int32_t, size_t depth_c = 64, bool action_e=false> auto StreamPath(const auto& j, auto f)
 	{
 		std::string path;
 		int_t index[depth_c] = { 0 };
 
-		return StreamJsonNoRecursion2<int_t, depth_c>(j, [&](const auto& v, auto depth)
+		return StreamJsonNoRecursion2<int_t, depth_c,action_e>(j, [&](const auto& v, auto depth)
 		{
 			switch (v.type)
 			{
@@ -439,11 +550,11 @@ namespace d8u
 					index[depth] = 0;
 				}
 			}
-				return true;
+				return StreamActions2::Continue;
 			case TypeObject:
 			case TypeArray:
 				if (v.current == TypeRoot)
-					return true;
+					return StreamActions2::Continue;
 
 				if (v.current == TypeObject)
 				{
@@ -456,11 +567,11 @@ namespace d8u
 
 				index[depth]++;
 
-				return true;
+				return StreamActions2::Continue;
 			case TypeString:
 			case TypeUndetermined:
 			{
-				bool result = f(path + ( v.current == TypeObject ? std::string(v.Key(j)) : std::to_string(index[depth])), v);
+				auto result = f(path + ( v.current == TypeObject ? std::string(v.Key(j)) : std::to_string(index[depth])), v);
 
 				index[depth]++;
 				return result;
@@ -476,12 +587,12 @@ namespace d8u
 
 		size_t current = 0;
 
-		StreamPath<int_t, depth_c>(j, [&](const auto& path, const auto& v) 
+		StreamPath<int_t, depth_c,true>(j, [&](const auto& path, const auto& v) 
 		{
 			if (size_t i = ___match_all(0, path, args_t...); i != -1)
 				current++, result[i] = v.Value(j);
 
-			return current != total;
+			return current != total ? StreamActions2::Continue : StreamActions2::Break;
 		});
 
 		return result;
@@ -715,13 +826,13 @@ namespace d8u
 			Clear();
 			json = j;
 
-			return StreamJsonNoRecursion2<int_t>(j, [&](const auto& v, auto depth)
+			return StreamJsonNoRecursion2<int_t,depth_c>(j, [&](const auto& v, auto depth)
 			{
 				switch (v.type)
 				{
-				default: return true;
+				default: return StreamActions2::Continue;
 				case TypeString:
-				case TypeUndetermined: Insert(v.Key(json),v); return true;
+				case TypeUndetermined: Insert(v.Key(json),v); return StreamActions2::Continue;
 				}
 			});
 		}
@@ -740,7 +851,7 @@ namespace d8u
 
 			return StreamPath<int_t, depth_c>(j, [&](const auto& path, const auto& v) {
 				Insert(path, v);
-				return true;
+				return StreamActions2::Continue;
 			});
 		}
 

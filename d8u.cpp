@@ -37,8 +37,25 @@ int main(int argc, char* argv[])
 #endif //BENCHMARK_RUNNER
 
 
+#ifdef BENCHMARK_SIMD
 
-#if ! defined(BENCHMARK_RUNNER) && ! defined(TEST_RUNNER)
+
+#define PICOBENCH_IMPLEMENT
+#include "picobench.hpp"
+#include "d8u/bench_simd.hpp"
+
+int main(int argc, char* argv[])
+{
+    picobench::runner runner;
+    return runner.run();
+}
+
+
+#endif //BENCHMARK_SIMD
+
+
+
+#if ! defined(BENCHMARK_RUNNER) && ! defined(TEST_RUNNER) && ! defined(BENCHMARK_SIMD)
 
 
 int main(int argc, char* argv[])

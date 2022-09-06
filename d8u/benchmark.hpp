@@ -5,8 +5,11 @@
 #include "../picobench.hpp"
 #include "../nlohmann_json.hpp"
 #include "../picojson.h"
+#include "../simdjson.h"
 #include "json.hpp"
 #include "json_stack.hpp"
+#include "json_simd.hpp"
+#include "bench_data.hpp"
 
 using namespace d8u::json;
 
@@ -14,235 +17,6 @@ namespace d8u
 {
     namespace benchmark
     {
-        auto const _small = R"(
-        {
-          "aliceblue": "#f0f8ff",
-          "antiquewhite": "#faebd7",
-          "aqua": "#00ffff",
-          "aquamarine": "#7fffd4",
-          "azure": "#f0ffff",
-          "beige": "#f5f5dc",
-          "bisque": "#ffe4c4",
-          "black": "#000000",
-          "blanchedalmond": "#ffebcd",
-          "blue": "#0000ff",
-          "blueviolet": "#8a2be2",
-          "brown": "#a52a2a"
-        })";
-
-        auto const _medium = R"(
-        {
-          "colors": [
-            {
-              "color": "black",
-              "category": "hue",
-              "type": "primary",
-              "code": {
-                "rgba": [255,255,255,1],
-                "hex": "#000"
-              }
-            },
-            {
-              "color": "white",
-              "category": "value",
-              "code": {
-                "rgba": [0,0,0,1],
-                "hex": "#FFF"
-              }
-            },
-            {
-              "color": "red",
-              "category": "hue",
-              "type": "primary",
-              "code": {
-                "rgba": [255,0,0,1],
-                "hex": "#FF0"
-              }
-            },
-            {
-              "color": "blue",
-              "category": "hue",
-              "type": "primary",
-              "code": {
-                "rgba": [0,0,255,1],
-                "hex": "#00F"
-              }
-            },
-            {
-              "color": "yellow",
-              "category": "hue",
-              "type": "primary",
-              "code": {
-                "rgba": [255,255,0,1],
-                "hex": "#FF0"
-              }
-            },
-            {
-              "color": "green",
-              "category": "hue",
-              "type": "secondary",
-              "code": {
-                "rgba": [0,255,0,1],
-                "hex": "#0F0"
-              }
-            }
-          ]
-        })";
-
-        auto const _large = R"(
-        {
-          "query":[{
-                  "_id": {
-                    "$oid": "5968dd23fc13ae04d9000001"
-                  },
-                  "product_name": "sildenafil citrate",
-                  "supplier": "Wisozk Inc",
-                  "quantity": 261,
-                  "unit_cost": "$10.47"
-                }, {
-                  "_id": {
-                    "$oid": "5968dd23fc13ae04d9000002"
-                  },
-                  "product_name": "Mountain Juniperus ashei",
-                  "supplier": "Keebler-Hilpert",
-                  "quantity": 292,
-                  "unit_cost": "$8.74"
-                }, {
-                  "_id": {
-                    "$oid": "5968dd23fc13ae04d9000003"
-                  },
-                  "product_name": "Dextromathorphan HBr",
-                  "supplier": "Schmitt-Weissnat",
-                  "quantity": 211,
-                  "unit_cost": "$20.53"
-                }],
-            "more":[
-  {
-      "id": 157538,
-      "date": "2017-07-21T10:30:34",
-      "date_gmt": "2017-07-21T17:30:34",
-      "guid": {
-          "rendered": "https://www.sitepoint.com/?p=157538"
-      },
-      "modified": "2017-07-23T21:56:35",
-      "modified_gmt": "2017-07-24T04:56:35",
-      "slug": "why-the-iot-threatens-your-wordpress-site-and-how-to-fix-it",
-      "status": "publish",
-      "type": "post",
-      "link": "https://www.sitepoint.com/why-the-iot-threatens-your-wordpress-site-and-how-to-fix-it/",
-      "title": {
-          "rendered": "Why the IoT Threatens Your WordPress Site (and How to Fix It) "
-      },
-      "content": {
-   
-        },
-            "excerpt" : {
-
-            },
-                "author" : 72546,
-                    "featured_media" : 157542,
-                    "comment_status" : "open",
-                    "ping_status" : "closed",
-                    "sticky" : false,
-                    "template" : "",
-                    "format" : "standard",
-                    "meta" : [] ,
-                    "categories" : [
-                        6132
-                    ] ,
-                    "tags" : [
-                        1798,
-                            6298
-                    ]
-
-      }
-  ],
-          "total": 25,
-          "limit": 10,
-          "skip": 0,
-          "data": [{
-            "_id": "5968fcad629fa84ab65a5247",
-            "first_name": "Sabrina",
-            "last_name": "Mayert",
-            "address": "69756 Wendy Junction",
-            "phone": "1-406-866-3476 x478",
-            "email": "donny54@yahoo.com",
-            "updatedAt": "2017-07-14T17:17:33.010Z",
-            "createdAt": "2017-07-14T17:17:33.010Z",
-            "__v": 0
-          }, {
-            "_id": "5968fcad629fa84ab65a5246",
-            "first_name": "Taryn",
-            "last_name": "Dietrich",
-            "address": "42080 Federico Greens",
-            "phone": "(197) 679-7020 x98462",
-            "email": "betty_schaefer1@gmail.com",
-            "updatedAt": "2017-07-14T17:17:33.006Z",
-            "createdAt": "2017-07-14T17:17:33.006Z",
-            "__v": 0
-          }
-          ],
-            "as": "AS16509 Amazon.com, Inc.",
-          "city": "Boardman",
-          "country": "United States",
-          "countryCode": "US",
-          "isp": "Amazon",
-          "lat": 45.8696,
-          "lon": -119.688,
-          "org": "Amazon",
-          "region": "OR",
-          "regionName": "Oregon",
-          "status": "success",
-          "timezone": "America\/Los_Angeles",
-          "zip": "97818"
-        })";
-
-        class Small
-        {
-        public:
-            const std::string_view data = _small;
-        };
-
-        class Medium
-        {
-        public:
-            const std::string_view data = _medium;
-        };
-
-        class Large
-        {
-        public:
-            const std::string_view data = _large;
-        };
-
-        class Huge
-        {
-        public:
-            Huge()
-                : file("small.json")
-                , data(file.data(),file.size())
-            {
-
-            }
-
-            mio::mmap_source file;
-            const std::string_view data;
-        };
-
-        class Giant
-        {
-        public:
-            Giant()
-                : file("big.json")
-                , data(file.data(),file.size())
-            {
-
-            }
-
-            mio::mmap_source file;
-            const std::string_view data;
-        };
-
         template <typename D> void nlohmann_json(picobench::state& s)
         {
             D d;
@@ -335,6 +109,88 @@ namespace d8u
             }
         }
 
+        template <typename D> void jscntctrl(picobench::state& s)
+        {
+            D d;
+            size_t total = 0;
+            {
+                picobench::scope scope(s);
+
+                for (auto _ : s)
+                    total = JsonCountControl(d.data).count;
+            }
+        }
+
+        template <typename D> void jsactrl(picobench::state& s)
+        {
+            D d;
+            size_t total = 0;
+            {
+                picobench::scope scope(s);
+
+                for (auto _ : s)
+                    total = JsonAvx2ParseKVAlign64(d.data.data());
+            }
+
+            std::cout << "TTT" << total << std::endl;
+        }
+
+        template <typename D> void jsa16ctrl(picobench::state& s)
+        {
+            D d;
+            size_t total = 0;
+            {
+                picobench::scope scope(s);
+
+                for (auto _ : s)
+                    total = JsonAvxParseKVAlign16(d.data.data());
+            }
+
+            std::cout << "TTT" << total << std::endl;
+        }
+
+        template <typename D> void jsoncontrol(picobench::state& s)
+        {
+            D d;
+            size_t total = 0;
+            {
+                picobench::scope scope(s);
+
+                for (auto _ : s)
+                    total = JsonObjectParse(d.data);
+            }
+
+            std::cout << "CTL " << total << " " << d.data.size() << std::endl;
+        }
+
+        template <typename D> void partialcontrol(picobench::state& s)
+        {
+            D d;
+            size_t total = 0;
+            {
+                picobench::scope scope(s);
+
+                for (auto _ : s)
+                    total = PartialAvxObjectParse(d.data);
+            }
+
+            std::cout << "PAVX " << total << " " << d.data.size() << std::endl;
+        }
+
+        template <typename D> void avxcontrol(picobench::state& s)
+        {
+            D d;
+            size_t total = 0;
+            {
+                picobench::scope scope(s);
+
+                for (auto _ : s)
+                    total = JsonAvx2Parse(d.data.data());
+            }
+
+            std::cout << "AVX " << total << " " << d.data.size() << std::endl;
+        }
+
         template <typename D, typename int_t, size_t max_c> void jsonfixedseq2(picobench::state& s)
         {
             D d;
@@ -342,7 +198,7 @@ namespace d8u
                 picobench::scope scope(s);
 
                 for (auto _ : s)
-                    JsonFixedSeq2<int_t,max_c> q(d.data);
+                    JsonFixedSeq2<int_t, max_c> q(d.data);
             }
         }
 
@@ -368,6 +224,17 @@ namespace d8u
             }
         }
 
+        template <typename D, typename int_t, size_t depth_c, size_t map_c> void jsondh(picobench::state& s)
+        {
+            D d;
+            {
+                picobench::scope scope(s);
+
+                for (auto _ : s)
+                    JsonFixedRng<depth_c, map_c, int_t, DoubleHash, false> q(d.data);
+            }
+        }
+
         template <typename D, typename int_t, size_t depth_c, size_t map_c> void jsonselect(picobench::state& s)
         {
             D d;
@@ -389,6 +256,23 @@ namespace d8u
                 for (auto _ : s)
                     q.Stream([](auto, auto, auto, auto) {});
             }
+        }
+
+        template <typename D> void simd_json(picobench::state& s)
+        {
+            D d;
+            simdjson::ondemand::parser parser;
+            simdjson::ondemand::document doc;
+            simdjson::simdjson_result error = 0;
+            simdjson::padded_string ps(d.data);
+            {
+                picobench::scope scope(s);
+
+                for (auto _ : s)
+                    error = parser.iterate(ps).get(doc);
+            }
+            
+            std::cout << error << std::endl;
         }
 
 
@@ -435,6 +319,8 @@ namespace d8u
         auto json_mediumseqf = jsonfixedseq<Medium, 128>;
         auto json_mediumseqf2 = jsonfixedseq2<Medium, uint16_t, 128>;
         auto json_mediumrngf = jsonfixedrng<Medium, uint16_t, 16, 128>;
+        auto json_mjsoncontrol = jsoncontrol<Medium>;
+        auto json_mavxcontrol = avxcontrol<Medium>;
         auto json_mnlohmann = nlohmann_json<Medium>;
         auto json_mpico = pico_json<Medium>;
 
@@ -445,6 +331,8 @@ namespace d8u
         //PICOBENCH(json_mediumseqf);
         PICOBENCH(json_mediumseqf2);
         PICOBENCH(json_mediumrngf);
+        PICOBENCH(json_mjsoncontrol);
+        PICOBENCH(json_mavxcontrol);
         PICOBENCH(json_mnlohmann);
         PICOBENCH(json_mpico);
 
@@ -457,6 +345,9 @@ namespace d8u
         auto json_large64 = json<JsonReaderH, Large>;
         auto json_largeseqf = jsonfixedseq<Large, 128>;
         auto json_largeseqf2 = jsonfixedseq2<Large, uint16_t, 128>;
+        auto json_ljsoncontrol = jsoncontrol<Large>;
+        auto json_ljpcontrol = partialcontrol<Large>;
+        auto json_lavxcontrol = avxcontrol<Large>;
         auto json_largerngf = jsonfixedrng<Large, uint16_t, 16, 128>;
         auto json_largestack = stack<Large>;
         auto json_lnlohmann = nlohmann_json<Large>;
@@ -469,6 +360,9 @@ namespace d8u
         //PICOBENCH(json_largeseqf);
         PICOBENCH(json_largeseqf2);
         PICOBENCH(json_largerngf);
+        PICOBENCH(json_ljsoncontrol);
+        PICOBENCH(json_ljpcontrol);
+        PICOBENCH(json_lavxcontrol);
         PICOBENCH(json_lnlohmann);
         PICOBENCH(json_lpico);
 
@@ -494,28 +388,60 @@ namespace d8u
 
         PICOBENCH_SUITE("Giant JSON");
 
-        //auto json_giant16 = json<JsonReader, Giant>;
-        //auto json_giant32 = json<JsonReaderL, Giant>;
-        //auto json_giant64 = json<JsonReaderH, Giant>;
+
         auto json_giantstack = stack<Giant>;
         auto json_giantpath= jsonpath<Giant,int32_t,64,1024*1024>;
+        auto json_giantpath2 = jsondh<Giant, int32_t, 64, 1024 * 1024>;
         auto json_giantselect = jsonselect<Giant, int32_t, 64, 1024 * 1024>;
+        auto json_gjsoncontrol = jsoncontrol<Giant>;
+        auto json_gpcontrol = partialcontrol<Giant>;
+        auto json_gavxcontrol = avxcontrol<Giant>;
         auto json_gnlohmann = nlohmann_json<Giant>;
         auto json_gpico = pico_json<Giant>;
+        auto json_gsimd = simd_json<Giant>;
 
-        //PICOBENCH(json_giant16);
-        //PICOBENCH(json_giant32);
-        //PICOBENCH(json_giant64);
-        //PICOBENCH(json_giantstack).iterations({ 1 });
-        PICOBENCH(json_giantpath).iterations({ 1 });
-        PICOBENCH(json_giantselect).iterations({ 1 });
-        PICOBENCH(json_gnlohmann).iterations({ 1 });
-        //PICOBENCH(json_gpico);
+        PICOBENCH(json_giantstack).iterations({ 4 });
+        PICOBENCH(json_giantpath).iterations({ 4 });
+        PICOBENCH(json_giantpath2).iterations({ 4 });
+        PICOBENCH(json_gjsoncontrol).iterations({ 4 });
+        PICOBENCH(json_gpcontrol).iterations({ 4 });
+        PICOBENCH(json_gavxcontrol).iterations({ 4 });
+        PICOBENCH(json_giantselect).iterations({ 4 });
+        PICOBENCH(json_gnlohmann).iterations({ 4 });
+        PICOBENCH(json_gsimd).iterations({ 4 });
+        PICOBENCH(json_gpico).iterations({ 4 });
 
 
 
-        /*
-            TODO Access Times
-        */
+        PICOBENCH_SUITE("MB25 JSON");
+
+
+        auto json_25stack = stack<MB25>;
+        auto json_25path = jsonpath<MB25, int32_t, 256, 6*1024 * 1024>;
+        auto json_25path2 = jsondh<MB25, int32_t, 256, 6 * 1024 * 1024>;
+        //auto json_25select = jsonselect<MB25, int32_t, 256, 8*1024 * 1024>;
+        auto json_25control = jsoncontrol<MB25>;
+        auto json_25pcontrol = partialcontrol<MB25>;
+        auto json_25cc = jscntctrl<MB25>;
+        auto json_actc = jsactrl<MB25>;
+        auto json_a16ctc = jsa16ctrl<MB25>;
+        auto json_25avxcontrol = avxcontrol<MB25>;
+        auto json_25nlohmann = nlohmann_json<MB25>;
+        auto json_25pico = pico_json<MB25>;
+        auto json_25simd = simd_json<MB25>;
+
+        PICOBENCH(json_25stack).iterations({ 1 });
+        PICOBENCH(json_25path).iterations({ 1 });
+        PICOBENCH(json_25path2).iterations({ 1 });
+        //PICOBENCH(json_25select).iterations({ 1 });
+        PICOBENCH(json_25control).iterations({ 1 });
+        PICOBENCH(json_25pcontrol).iterations({ 1 });
+        PICOBENCH(json_25cc).iterations({ 1 });
+        PICOBENCH(json_actc).iterations({ 1 });
+        PICOBENCH(json_a16ctc).iterations({ 1 });
+        PICOBENCH(json_25avxcontrol).iterations({ 1 });
+        PICOBENCH(json_25nlohmann).iterations({ 1 });
+        PICOBENCH(json_25pico).iterations({ 1 });
+        PICOBENCH(json_25simd).iterations({ 1 });
     }
 }

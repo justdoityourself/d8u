@@ -8,9 +8,20 @@
 #include "json.hpp"
 #include "json_stack.hpp"
 #include "transform.hpp"
+#include "json_simd.hpp"
+#include "bench_data.hpp"
 
 using namespace d8u::json;
 using namespace d8u::transform;
+
+const std::string_view sm_json = R"(
+    {
+        "as": "AS16509 Amazon.com, {Inc.",
+        "city": "Boa}rdman",
+        "country": "United{ States",
+        "countr}yCode": "US",
+        "isp": "Ama{zon"
+    })";
 
 const std::string_view json_sample = R"(
     {
@@ -103,6 +114,126 @@ const std::string_view _medium = R"(
     }
     ]
 })";
+
+TEST_CASE("JsonInplaceTrim", "[d8u::json]")
+{
+    std::string out(sm_json);
+    auto used = d8u::JsonInplaceTrim(out);
+
+    REQUIRE(true);
+}
+
+TEST_CASE("JsonMoveTrim", "[d8u::json]")
+{
+    std::string out;
+    out.resize(sizeof(sm_json));
+    auto used = d8u::JsonMoveTrim(sm_json, out.data());
+
+    REQUIRE(true);
+}
+
+TEST_CASE("parse avx", "[d8u::json]")
+{
+    //auto dx = d8u::JsonAvxParseKVAlign16(sm_json.data());
+
+    d8u::benchmark::MB25 d;
+    auto sz = d.data.size();
+    auto dx = d8u::JsonAvxParseKVAlign16(d.data.data());
+
+    REQUIRE(dx == sz);
+}
+
+TEST_CASE("parse avx2", "[d8u::json]")
+{
+    d8u::benchmark::TTT d2;
+    auto sz = d2.data.size();
+    auto dx = d8u::JsonAvx2Parse(d2.data.data());
+
+    REQUIRE(dx == sz);
+
+
+    sz = 7;
+    dx = d8u::JsonAvx2Parse("{     }");
+
+    REQUIRE(dx == sz);
+
+    std::string_view sv("{ \"long_string\":\"asddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd\" }");
+    sz = sv.size();
+    dx = d8u::JsonAvx2Parse(sv.data());
+
+    REQUIRE(dx == sz);
+
+    sz = sm_json.size();
+    dx = d8u::JsonAvx2Parse(sm_json.data());
+
+    REQUIRE(dx == sz);
+
+    sz = sm_json.size();
+    dx = d8u::JsonAvx2Parse(sm_json.data());
+
+    REQUIRE(dx == sz);
+
+    sz = json_sample.size();
+    dx = d8u::JsonAvx2Parse(json_sample.data());
+    //dx = d8u::JsonAvx2ParseN(json_sample.data());
+
+    REQUIRE(dx == sz);
+
+    sz = _medium.size();
+    dx = d8u::JsonAvx2Parse(_medium.data());
+
+    REQUIRE(dx == sz);
+
+    auto lg = std::string_view(d8u::benchmark::_large);
+
+    sz = lg.size();
+    dx = d8u::JsonAvx2Parse(lg.data());
+
+    REQUIRE(dx == sz);
+
+    d8u::benchmark::MB25 d;
+    sz = d.data.size();
+    dx = d8u::JsonObjectParse(d.data);
+
+    REQUIRE(dx == sz);
+
+    dx = d8u::JsonAvx2Parse(d.data.data());
+
+    REQUIRE(dx == sz);
+
+}
+
+TEST_CASE("find avx", "[d8u::json]")
+{
+    auto dx = d8u::find_avx2_unaligned("fdfdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd" + 1, 'f');
+
+    REQUIRE(dx == 1);
+
+    dx = d8u::find_avx2_unaligned("fdddddddddddddddfdddddddddddddddddddddddddddddddddddddddddddddddddddddd" + 1, 'f');
+
+    REQUIRE(dx == 15);
+
+    dx = d8u::find_avx2_unaligned("fdddfdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd" + 1, 'f');
+
+    REQUIRE(dx == 3);
+
+    const auto data = "gggggggggggggggggggggggggggggggggggggggggggggggggggggfdddddddddddddddddddddddddddddddf";
+    dx = d8u::find_avx2(data,'f');
+
+    REQUIRE(dx == 53);
+
+    dx = d8u::find_avx2_unaligned(data + 33, 'f');
+
+    REQUIRE(dx == 20);
+
+    dx = d8u::find_avx2_unaligned(data+3, 'f');
+
+    REQUIRE(dx == 50);
+
+    dx = d8u::find_avx2_unaligned(data + 54, 'f');
+
+    REQUIRE(dx == 31);
+}
 
 TEST_CASE("path object", "[d8u::json]")
 {

@@ -93,9 +93,6 @@ namespace d8u
 #endif
 		}
 
-		using namespace gsl;
-		using namespace std;
-
 		template<typename T> class dec_scope
 		{
 			T& t;
@@ -479,7 +476,7 @@ namespace d8u
 		}*/
 
 		//Performance consideration, limit length to 16 iterations
-		template < typename T > void FactorExpand(const span<T>& poly, span<T> output)
+		template < typename T > void FactorExpand(const gsl::span<T>& poly, gsl::span<T> output)
 		{
 			auto const u = poly.size();
 			vector<T> l(u + output.size());
