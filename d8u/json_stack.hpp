@@ -7,7 +7,6 @@ namespace d8u
 	size_t JsonObjectParse(std::string_view json,size_t depth=0)
 	{
 		const char* itr = json.data();
-		//const char* start;
 		const char* end = itr+json.size();
 
 		for (; itr < end; itr++)
@@ -17,14 +16,8 @@ namespace d8u
 			case '\"':
 				itr++;
 
-				//start = itr;
 				while (*itr != '"' && itr < end)
 					itr++;
-
-				//if (*start == ':' && *(start + 1) == ' ')
-				//	std::cout << "HERE";
-
-				//std::cout << std::string_view(start, itr) << std::endl;
 
 				break;
 			case '{':
@@ -179,17 +172,16 @@ namespace d8u
 if constexpr (action_e) {switch(action){\
 case StreamActions2::Continue: break;\
 case StreamActions2::Break: return false; break;\
-case StreamActions2::SkipObject: itr += JsonObjectParse(std::string_view(itr,end)); break;\
+case StreamActions2::SkipObject: if constexpr (simd_e) itr += JsonAvx2Parse(itr,1)-2; else itr += JsonObjectParse(std::string_view(itr,end),1)-2; break;\
 }}
 
-	template <typename int_t = int32_t, size_t depth_c = 64, bool action_e=false> bool StreamJsonNoRecursion2(std::string_view json, auto cb)
+	template <typename int_t = int32_t, size_t depth_c = 64, bool action_e = false, bool simd_e = true> bool StreamJsonNoRecursion2(std::string_view json, auto cb)
 	{
 		int_t key_dx = 0;
 		int_t key_len = 0;
 		StreamActions2 action;
 
 		const char* start = nullptr;
-		bool inside_string = false;
 		StackTypes current_type = TypeRoot;
 
 		size_t depth = -1;
@@ -199,19 +191,20 @@ case StreamActions2::SkipObject: itr += JsonObjectParse(std::string_view(itr,end
 		const char* end = itr + json.size();
 
 		const char* root = itr;
-		for (; itr < end;itr++)
+		for (; itr < end; itr++)
 		{
 			if (current_type == TypeUndetermined && *itr != '{')
 				continue;
 
 			switch (*itr)
 			{
-			case ':': case ' ': case '\t': case '\n': case '\r': break;
 			case '\"':
-				start = ++itr;
-				
-				while (*itr != '"' && itr < end)
-					itr++;
+				start = itr + 1;
+
+				if constexpr (simd_e)
+					itr += find_avx2_unaligned(start, '"') + 1;
+				else
+					while (*++itr != '"');
 
 				if (key_dx)
 				{
@@ -226,7 +219,7 @@ case StreamActions2::SkipObject: itr += JsonObjectParse(std::string_view(itr,end
 					action = cb(JsonStreamRecord2< int_t>{ current_type, TypeString, 0, 0, (int_t)(start - root), (int_t)(itr - start) }, depth);
 
 					ActionHandler2();
-						
+
 					start = nullptr;
 				}
 				else
@@ -237,7 +230,7 @@ case StreamActions2::SkipObject: itr += JsonObjectParse(std::string_view(itr,end
 				if (depth == depth_c)
 					return false;
 
-				action = cb(JsonStreamRecord2< int_t>{ current_type, TypeObject, key_dx, key_len, (int_t)(itr - start), 0 }, depth);
+				action = cb(JsonStreamRecord2< int_t>{ current_type, TypeObject, key_dx, key_len, (int_t)(itr - root), 0 }, depth);
 
 				ActionHandler2();
 
@@ -257,11 +250,11 @@ case StreamActions2::SkipObject: itr += JsonObjectParse(std::string_view(itr,end
 
 					key_dx = 0, key_len = 0, start = nullptr;
 				}
-					
-				if (depth == -1)
+
+				if (depth == (size_t)-1)
 					return false;
 
-				action = cb(JsonStreamRecord2< int_t>{ current_type, TypeClose, 0, 0, (int_t)(itr - start), 0 }, depth);
+				action = cb(JsonStreamRecord2< int_t>{ current_type, TypeClose, 0, 0, (int_t)((itr + 1) - root), 0 }, depth);
 
 				ActionHandler2();
 
@@ -283,6 +276,7 @@ case StreamActions2::SkipObject: itr += JsonObjectParse(std::string_view(itr,end
 
 				break;
 
+			case ':': case ' ': case '\t': case '\n': case '\r':
 			case ',':
 				if (start)
 				{
@@ -634,6 +628,15 @@ case StreamActions2::SkipObject: itr += JsonObjectParse(std::string_view(itr,end
 //TODO this doesn't work because all #__VA_ARGS__ turns into one string instead of a list of strings
 //#define JsonMove(x,...) std::tie(__VA_ARGS__) = d8u::JsonSelectCopy(x,#__VA_ARGS__)
 
+	template<typename int_t> int_t fast_atot(std::string_view str)
+	{
+		int_t val = 0;
+		for (auto c : str)
+			val = val * 10 + (c - '0');
+
+		return val;
+	}
+
 	template <typename T> T _Convert(const auto& a)
 	{
 		if (!a.size())
@@ -646,11 +649,11 @@ case StreamActions2::SkipObject: itr += JsonObjectParse(std::string_view(itr,end
 		else if constexpr (std::is_same_v<T, std::string>)
 			return std::string(a);
 		else if constexpr (std::is_same_v<T, int64_t>)
-			return std::stoll(a.data());
+			return fast_atot<T>(a);
 		else if constexpr (std::is_same_v<T, uint64_t>)
-			return std::stoull(a.data());
+			return fast_atot<T>(a);
 		else if constexpr (std::is_same_v<T, int>)
-			return std::stoi(a.data());
+			return fast_atot<T>(a);
 		else if constexpr (std::is_same_v<T, float>)
 			return std::stof(a.data());
 		else if constexpr (std::is_same_v<T, double>)
