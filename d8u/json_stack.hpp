@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "json_simd.hpp"
+
 namespace d8u
 {
 	size_t JsonObjectParse(std::string_view json,size_t depth=0)
@@ -175,6 +177,13 @@ case StreamActions2::Break: return false; break;\
 case StreamActions2::SkipObject: if constexpr (simd_e) itr += JsonAvx2Parse(itr,1)-2; else itr += JsonObjectParse(std::string_view(itr,end),1)-2; break;\
 }}
 
+#define ActionHandler2C(_S) \
+if constexpr (action_e) {switch(action){\
+case StreamActions2::Continue: break;\
+case StreamActions2::Break: return false; break;\
+case StreamActions2::SkipObject: if constexpr (simd_e) itr += JsonAvx2Parse(itr,_S)-2; else itr += JsonObjectParse(std::string_view(itr,end),1)-2; break;\
+}}
+
 	template <typename int_t = int32_t, size_t depth_c = 64, bool action_e = false, bool simd_e = true> bool StreamJsonNoRecursion2(std::string_view json, auto cb)
 	{
 		int_t key_dx = 0;
@@ -232,7 +241,7 @@ case StreamActions2::SkipObject: if constexpr (simd_e) itr += JsonAvx2Parse(itr,
 
 				action = cb(JsonStreamRecord2< int_t>{ current_type, TypeObject, key_dx, key_len, (int_t)(itr - root), 0 }, depth);
 
-				ActionHandler2();
+				ActionHandler2C(0);
 
 				key_dx = 0, key_len = 0, start = nullptr;
 				stack[++depth] = current_type = TypeObject;
@@ -267,7 +276,7 @@ case StreamActions2::SkipObject: if constexpr (simd_e) itr += JsonAvx2Parse(itr,
 				if (depth == depth_c)
 					return false;
 
-				action = cb(JsonStreamRecord2< int_t>{ current_type, TypeArray, key_dx, key_len, 0, 0 }, depth);
+				action = cb(JsonStreamRecord2< int_t>{ current_type, TypeArray, key_dx, key_len, (int_t)(itr - root), 0 }, depth);
 
 				ActionHandler2();
 

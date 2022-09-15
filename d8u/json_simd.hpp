@@ -1,19 +1,13 @@
 /* Copyright (C) 2022 D8DATAWORKS - All Rights Reserved */
 
 #pragma once
-//#include <mmintrin.h>  //MMX
-//#include <xmmintrin.h> //SSE
-//#include  <emmintrin.h> //SSE2
-//#include <pmmintrin.h> //SSE3
-//#include <tmmintrin.h> //SSSE3
-//#include <smmintrin.h> //SSE4.1
-//#include < nmmintrin.h > //SSE4.2
-//#include < ammintrin.h > //SSE4A
-//#include <wmmintrin.h> //AES
-//#include <immintrin.h> AVX, AVX2, FMA
 
 #include <immintrin.h>
+#ifdef _MSC_VER
 #include <intrin.h>
+#else
+#include <x86intrin.h>
+#endif
 
 #include <string_view>
 
@@ -116,7 +110,7 @@ namespace d8u
 			__m128i chunk = _mm_load_si128((__m128i const*)data);
 			__m128i results = _mm_cmpeq_epi8(chunk, tocmp);
 			int mask = _mm_movemask_epi8(results);
-			total += __popcnt(mask);
+			total += _mm_popcnt_u32(mask);
 		}
 		return total;
 	}
@@ -132,7 +126,7 @@ namespace d8u
 			__m256i chunk = _mm256_load_si256((__m256i const*)data);
 			__m256i results = _mm256_cmpeq_epi8(chunk, tocmp);
 			int mask = _mm256_movemask_epi8(results);
-			total += __popcnt(mask);
+			total += _mm_popcnt_u32(mask);
 		}
 		return total;
 	}
@@ -143,11 +137,11 @@ namespace d8u
 		return _mm_cvtsi128_si64(result); //result.m128i_i64[1];//
 	}
 
-	uint16_t prefix_xor16(const uint16_t bits) {
+	/*uint16_t prefix_xor16(const uint16_t bits) {
 		const __m128i all_ones = _mm_set1_epi8('\xFF');
 		__m128i result = _mm_clmulepi64_si128(_mm_set_epi64x(0ULL, bits), all_ones, 0);
 		return result.m128i_u16[0];
-	}
+	}*/
 
 	inline uint64_t avx2_find64(const char * data, const __m256i & f)
 	{
@@ -188,14 +182,14 @@ namespace d8u
 			auto open_mask = avx2_find64(data, _o) & str_nmask;
 			auto close_mask = avx2_find64(data, _c) & str_nmask;
 
-			depth += __popcnt64(open_mask); //_mm_popcnt_u64
-			depth -= __popcnt64(close_mask); //_mm_popcnt_u64
+			depth += _mm_popcnt_u64(open_mask); //_mm_popcnt_u64
+			depth -= _mm_popcnt_u64(close_mask); //_mm_popcnt_u64
 		}
 
 		return 0;
 	}
 
-	size_t JsonAvxParseKVAlign16(const char* start, int depth = 0)
+	/*size_t JsonAvxParseKVAlign16(const char* start, int depth = 0)
 	{
 		auto data = start;
 		const __m128i _q = _mm_set1_epi8('"');
@@ -229,7 +223,7 @@ namespace d8u
 		}
 
 		return -1;
-	}
+	}*/
 
 	size_t JsonAvx2ParseKVAlign64(const char* start, int depth = 0)
 	{
@@ -252,8 +246,8 @@ namespace d8u
 			auto open_mask = avx2_find64(data, _o) & str_nmask;
 			auto close_mask = avx2_find64(data, _c) & str_nmask;
 
-			auto open_count = __popcnt64(open_mask);
-			auto close_count = __popcnt64(close_mask);
+			auto open_count = _mm_popcnt_u64(open_mask);
+			auto close_count = _mm_popcnt_u64(close_mask);
 
 
 			depth += open_count - close_count;
@@ -415,11 +409,11 @@ namespace d8u
 			auto open_mask = (avx2_find64(data, _o) >> align) & str_nmask;
 			auto close_mask = (avx2_find64(data, _c) >> align)  & str_nmask;
 
-			auto close_count = __popcnt64(close_mask);
+			auto close_count = _mm_popcnt_u64(close_mask);
 
 			if (!close_count) [[likely]]
 			{
-				auto open_count = __popcnt64(open_mask);
+				auto open_count = _mm_popcnt_u64(open_mask);
 				depth += open_count - close_count;
 			}
 			else [[unlikely]]
@@ -487,11 +481,11 @@ namespace d8u
 			auto open_mask = avx2_find64(data, _o) & str_nmask;
 			auto close_mask = avx2_find64(data, _c) & str_nmask;
 
-			auto close_count = __popcnt64(close_mask);
+			auto close_count = _mm_popcnt_u64(close_mask);
 
 			if (close_count < depth) [[likely]]
 			{
-				auto open_count = __popcnt64(open_mask);
+				auto open_count = _mm_popcnt_u64(open_mask);
 				depth += open_count - close_count;
 			}
 			else [[unlikely]]
@@ -623,11 +617,11 @@ namespace d8u
 			auto open_mask = avx2_find64(data, _o) & str_nmask;
 			auto close_mask = avx2_find64(data, _c) & str_nmask;
 
-			auto close_count = __popcnt64(close_mask);
+			auto close_count = _mm_popcnt_u64(close_mask);
 
 			if(close_count < depth) [[likely]]
 			{
-				auto open_count = __popcnt64(open_mask);
+				auto open_count = _mm_popcnt_u64(open_mask);
 				depth += open_count - close_count;
 			}
 			else [[unlikely]]
