@@ -2,10 +2,51 @@
 
 #pragma once
 
+#ifndef NOAVX
 #include "json_simd.hpp"
+#endif
 
 namespace d8u
 {
+	size_t JsonObjectParseSafe(std::string_view json, size_t depth = 0)
+	{
+		const char* itr = json.data();
+		const char* end = itr + json.size();
+
+		static const char utf8_lengths[] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, /*0*/1, /*0*/1, /*0*/1, /*0*/1, /*0*/1, /*0*/1, /*0*/1, /*0*/1, 2, 2, 2, 2, 3, 3, 4, /*0*/1 };
+
+		for (; itr < end; itr++)
+		{
+			switch (*itr)
+			{
+			case '\"':
+				itr++;
+
+				while (*itr != '"' && itr < end)
+				{
+					int l = *itr == '\\' ? 2 : utf8_lengths[(unsigned char)(*itr) >> 3];
+					itr += l;
+				}
+
+				break;
+			case '{':
+				depth++;
+
+				break;
+
+			case '}':
+				depth--;
+
+				if (!depth)
+					return ++itr - json.data();
+
+				break;
+			}
+		}
+
+		return json.size();
+	}
+
 	size_t JsonObjectParse(std::string_view json,size_t depth=0)
 	{
 		const char* itr = json.data();
@@ -170,6 +211,8 @@ namespace d8u
 		SkipObject
 	};
 
+#ifndef NOAVX
+
 #define ActionHandler2() \
 if constexpr (action_e) {switch(action){\
 case StreamActions2::Continue: break;\
@@ -177,12 +220,32 @@ case StreamActions2::Break: return false; break;\
 case StreamActions2::SkipObject: if constexpr (simd_e) itr += JsonAvx2Parse(itr,1)-2; else itr += JsonObjectParse(std::string_view(itr,end),1)-2; break;\
 }}
 
+
 #define ActionHandler2C(_S) \
 if constexpr (action_e) {switch(action){\
 case StreamActions2::Continue: break;\
 case StreamActions2::Break: return false; break;\
-case StreamActions2::SkipObject: if constexpr (simd_e) itr += JsonAvx2Parse(itr,_S)-2; else itr += JsonObjectParse(std::string_view(itr,end),1)-2; break;\
+case StreamActions2::SkipObject: if constexpr (simd_e) itr += JsonAvx2Parse(itr,_S)-2; else itr += JsonObjectParse(std::string_view(itr,end),_S)-2; break;\
 }}
+
+#else
+
+#define ActionHandler2() \
+if constexpr (action_e) {switch(action){\
+case StreamActions2::Continue: break;\
+case StreamActions2::Break: return false; break;\
+case StreamActions2::SkipObject: itr += JsonObjectParse(std::string_view(itr,end),1)-2; break;\
+}}
+
+
+#define ActionHandler2C(_S) \
+if constexpr (action_e) {switch(action){\
+case StreamActions2::Continue: break;\
+case StreamActions2::Break: return false; break;\
+case StreamActions2::SkipObject: itr += JsonObjectParse(std::string_view(itr,end),_S)-2; break;\
+}}
+
+#endif
 
 	template <typename int_t = int32_t, size_t depth_c = 64, bool action_e = false, bool simd_e = true> bool StreamJsonNoRecursion2(std::string_view json, auto cb)
 	{
@@ -210,9 +273,11 @@ case StreamActions2::SkipObject: if constexpr (simd_e) itr += JsonAvx2Parse(itr,
 			case '\"':
 				start = itr + 1;
 
+#ifndef NOAVX
 				if constexpr (simd_e)
 					itr += find_avx2_unaligned(start, '"') + 1;
 				else
+#endif
 					while (*++itr != '"');
 
 				if (key_dx)

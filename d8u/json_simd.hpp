@@ -544,6 +544,176 @@ namespace d8u
 		return -1;
 	}
 
+	inline uint64_t avx2_greater64(const char* data, const __m256i& f)
+	{
+		const __m256i qm1 = _mm256_cmpgt_epi8(*(const __m256i*)data, f);
+		const __m256i qm2 = _mm256_cmpgt_epi8(*(const __m256i*)(data + 32), f);
+
+		uint64_t o = (uint32_t)_mm256_movemask_epi8(qm1);
+		uint64_t t = (uint32_t)_mm256_movemask_epi8(qm2);
+		t <<= 32;
+
+		return t | o;
+	}
+
+	size_t JsonAvx2ParseSafe(const char* start, int depth = 0)
+	{
+		const __m256i _q = _mm256_set1_epi8('"');
+		const __m256i _o = _mm256_set1_epi8('{');
+		const __m256i _c = _mm256_set1_epi8('}');
+		const __m256i _lim = _mm256_set1_epi8(127);
+		const __m256i _esc = _mm256_set1_epi8('\\');
+
+		//TODO CHECK for any _lim or esc and then use iterative parsing for this block
+
+		const size_t align = (size_t)start % 32;
+		const char* data = start - align;
+		int string_carry = 0;
+
+		{
+			const uint64_t t = avx2_find64(data, _q);
+			const auto str_mask = prefix_xor(t >> align);
+			const auto str_nmask = ~str_mask;
+			string_carry = str_mask >> 63;
+
+			auto open_mask = (avx2_find64(data, _o) >> align) & str_nmask;
+			auto close_mask = (avx2_find64(data, _c) >> align) & str_nmask;
+
+			auto close_count = _mm_popcnt_u64(close_mask);
+
+			if (!close_count) [[likely]]
+			{
+				auto open_count = _mm_popcnt_u64(open_mask);
+				depth += open_count - close_count;
+			}
+			else [[unlikely]]
+			{
+				/*auto scan = 0;
+				while (scan < 64)
+				{
+					auto lim1 = _tzcnt_u64(open_mask >> scan);
+					auto lim2 = _tzcnt_u64(close_mask >> scan);
+
+					if (lim1 == lim2)
+					{
+						scan += lim2 + 1;
+						continue;
+					}
+					else if (lim1 < lim2)
+					{
+						scan += lim1 + 1;
+						depth++;
+					}
+					else
+					{
+						scan += lim2 + 1;
+						depth--;
+
+						if (depth <= 0)
+							return scan;
+					}
+				}*/
+				for (auto scan = 0; open_mask || close_mask;)
+				{
+					auto lim1 = _tzcnt_u64(open_mask);
+					auto lim2 = _tzcnt_u64(close_mask);
+
+					if (lim1 < lim2)
+					{
+						scan += lim1 + 1;
+						open_mask >>= lim1 + 1;
+						close_mask >>= lim1 + 1;
+						depth++;
+					}
+					else
+					{
+						scan += lim2 + 1;
+						open_mask >>= lim2 + 1;
+						close_mask >>= lim2 + 1;
+						depth--;
+
+						if (!depth)
+							return scan;
+					}
+				}
+			}
+
+			data += 64;
+		}
+
+		for (; true; data += 64)
+		{
+			const uint64_t t = avx2_find64(data, _q) ^ string_carry;
+			const auto str_mask = prefix_xor(t);
+			const auto str_nmask = ~str_mask;
+			string_carry = str_mask >> 63;
+
+			auto open_mask = avx2_find64(data, _o) & str_nmask;
+			auto close_mask = avx2_find64(data, _c) & str_nmask;
+
+			auto close_count = _mm_popcnt_u64(close_mask);
+
+			if (close_count < depth) [[likely]]
+			{
+				auto open_count = _mm_popcnt_u64(open_mask);
+				depth += open_count - close_count;
+			}
+			else [[unlikely]]
+			{
+				/*auto scan = 0;
+				while (scan < 64)
+				{
+					auto lim1 = _tzcnt_u64(open_mask >> scan);
+					auto lim2 = _tzcnt_u64(close_mask >> scan);
+
+					if (lim1 == lim2)
+					{
+						scan += lim2 + 1;
+						continue;
+					}
+					else if (lim1 < lim2)
+					{
+						scan += lim1 + 1;
+						depth++;
+					}
+					else
+					{
+						scan += lim2 + 1;
+						depth--;
+
+						if (depth <= 0)
+							return data - start + scan;
+					}
+				}*/
+				for (auto scan = 0; open_mask || close_mask;)
+				{
+					auto lim1 = _tzcnt_u64(open_mask);
+					auto lim2 = _tzcnt_u64(close_mask);
+
+					if (lim1 < lim2)
+					{
+						scan += lim1 + 1;
+						open_mask >>= lim1 + 1;
+						close_mask >>= lim1 + 1;
+						depth++;
+					}
+					else
+					{
+						scan += lim2 + 1;
+						open_mask >>= lim2 + 1;
+						close_mask >>= lim2 + 1;
+						depth--;
+
+						if (!depth)
+							return data - start + scan;
+					}
+				}
+			}
+		}
+
+		return -1;
+	}
+
 	size_t JsonAvx2ParseTest(const char* start, int depth = 0)
 	{
 		/*///////////////////////////
